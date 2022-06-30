@@ -13,6 +13,8 @@ GameObject:
   - component: {fileID: 1485445418320543927}
   - component: {fileID: 1485445418320543926}
   - component: {fileID: 1485445418320543925}
+  - component: {fileID: 4497666583675543936}
+  - component: {fileID: 3168134124906875357}
   m_Layer: 0
   m_Name: WolfHead
   m_TagString: Enemy
@@ -151,3 +153,35 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 7
+--- !u!114 &4497666583675543936
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1485445418320543930}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6694818dc366c5646b9a96e96d25e579, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  cowHead: {fileID: 0}
+  animator: {fileID: 1485445418320543929}
+  runSpeed: 3
+  visionRange: 5
+--- !u!114 &3168134124906875357
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1485445418320543930}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6694818dc366c5646b9a96e96d25e579, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  cowHead: {fileID: 0}
+  animator: {fileID: 1485445418320543929}
+  runSpeed: 3
+  visionRange: 5
