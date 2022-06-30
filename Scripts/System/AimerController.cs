@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class WolfHeadController : MonoBehaviour
+public class AimerController : MonoBehaviour
 {
     // Start is called before the first frame update
     void Start()
@@ -13,8 +13,8 @@ public class WolfHeadController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
+        Vector3 pointer = Input.mousePosition;
+        pointer.z = 5f;
+        gameObject.transform.position = Camera.main.ScreenToWorldPoint(pointer);
     }
-
-
 }

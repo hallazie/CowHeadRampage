@@ -7,7 +7,6 @@ public class CowHeadMovement : MonoBehaviour
 {
 
     private CowHeadStatus status = new CowHeadStatus();
-    private string prevAnimation;
 
     public Animator animator;
     public BoxCollider2D characterBoxCollider;
@@ -36,12 +35,16 @@ public class CowHeadMovement : MonoBehaviour
 
         UpdateAnimationByCHStatus();
 
-        weaponBoxCollider.OverlapCollider(weaponBoxFilter, weaponHits);
-        for (int i = 0; i< weaponHits.Length; i++)
+        if (enableDamage)
         {
-            if (weaponHits[i] != null && weaponHits[i].name != "CowHead")
-                print("colliding with " + weaponHits[i].name);
+            weaponBoxCollider.OverlapCollider(weaponBoxFilter, weaponHits);
+            for (int i = 0; i < weaponHits.Length; i++)
+            {
+                if (weaponHits[i] != null && weaponHits[i].tag == "Enemy")
+                    print("Colliding with " + weaponHits[i].name);
+            }
         }
+
     }
 
     private void FixedUpdate()
@@ -67,13 +70,13 @@ public class CowHeadMovement : MonoBehaviour
 
     public void DamageSwitch()
     {
-        if (enableDamage)
+        if (status.attack && !enableDamage)
         {
-            enableDamage = false;
+            enableDamage = true;
         }
         else
         {
-            enableDamage = true;
+            enableDamage = false;
         }
     }
 
