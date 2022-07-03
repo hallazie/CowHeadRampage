@@ -38,7 +38,6 @@ public class MovementController : MonoBehaviour
     public float Speed = 5f;
 
     public int meleeRate = 2;
-    private float nextMeleeTime = 0f;
 
     // Start is called before the first frame update
     void Start()
