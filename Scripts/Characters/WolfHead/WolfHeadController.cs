@@ -44,6 +44,12 @@ public class WolfHeadController : AttackablePawn
     {
         if (!alive)
             return;
+        if (!GameManager.instance.playerAlive)
+        {
+            animator.SetFloat("Speed", 0f);
+            animator.SetBool("InFistAttackRange", false);
+            return;
+        }
         isPlayerVisible = IsPlayerVisible();
         Vector3 distance = cowHead.transform.position - gameObject.transform.position;
         // print("distance: " + distance.magnitude.ToString() + ", visionRange: " + visionRange.ToString() + ", attackRange: " + fistAttackRange.ToString());
