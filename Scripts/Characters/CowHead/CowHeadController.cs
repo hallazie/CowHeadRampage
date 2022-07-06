@@ -99,8 +99,12 @@ public class CowHeadController : AttackablePawn
     {
         Vector3 direction = (message.target - message.origin).normalized;
         direction.z = 0;
-        Vector3 position = new Vector3(message.target.x + direction.x * 3, message.target.y + direction.y * 3, 0);
+        Vector3 position = new Vector3(message.target.x + direction.x * 5, message.target.y + direction.y * 5, 0);
         bloodSpreadController.DrawBloodSpread(position, direction);
     }
 
+    public override void Dead()
+    {
+        
+    }
 }

@@ -13,4 +13,6 @@ public abstract class AttackablePawn : MonoBehaviour
     public abstract void CauseDamage();
 
     public abstract void AttackEffect(MessageAttackEffect message);
+
+    public abstract void Dead();
 }

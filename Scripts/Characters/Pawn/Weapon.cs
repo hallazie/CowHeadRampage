@@ -50,7 +50,7 @@ public class Weapon : MonoBehaviour
     void OnCollisionEnter2D()
     {
 
-    }
+    } 
 
     public void OnAttack(string targetTag)
     {
