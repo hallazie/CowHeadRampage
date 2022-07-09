@@ -17,6 +17,7 @@ public class CowHeadController : AttackablePawn
 
     public int attackDamage = 10;
     public int health = 100;
+    public int maxHealth;
 
     public delegate void AttackDelegate();
     public AttackDelegate attackDelegate;
@@ -32,7 +33,7 @@ public class CowHeadController : AttackablePawn
     // Start is called before the first frame update
     void Start()
     {
-        
+        maxHealth = health;   
     }
 
     // Update is called once per frame
@@ -71,6 +72,25 @@ public class CowHeadController : AttackablePawn
         status.ResolveStatusConflict();
         animator.SetFloat("Speed", status.speed);
         animator.SetBool("Attack", status.attack);
+    }
+
+    public void Respawn()
+    {
+        /*
+         复活，类似MH中按R复活
+         */
+        alive = true;
+        health = maxHealth;
+        animator.enabled = true;
+        gameObject.GetComponent<SpriteRenderer>().sortingLayerName = "Player";
+        gameObject.GetComponent<SpriteRenderer>().sprite = null;
+        foreach (BoxCollider2D boxCollider2D in gameObject.GetComponentsInChildren<BoxCollider2D>())
+        {
+            boxCollider2D.enabled = true;
+        }
+        animator.SetFloat("Speed", 0f);
+        animator.SetBool("Attack", false);
+        animator.SetBool("Dead", false);
     }
 
     // ---------------------------- OVERRIDE ATTACKABLE PAWN ----------------------------
@@ -117,6 +137,7 @@ public class CowHeadController : AttackablePawn
     public override void Dead()
     {
         animator.enabled = false;
+        gameObject.GetComponent<SpriteRenderer>().sortingLayerName = "Default";
         gameObject.GetComponent<SpriteRenderer>().sprite = deadSprite;
         foreach (BoxCollider2D boxCollider2D in gameObject.GetComponentsInChildren<BoxCollider2D>())
         {

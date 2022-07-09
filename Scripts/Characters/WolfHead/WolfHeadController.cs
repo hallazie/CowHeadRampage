@@ -15,9 +15,11 @@ public class WolfHeadController : AttackablePawn
     public float visionRange = 16f;
     public float sprintRange = 8f;
     public float fistAttackRange = 2f;
+    public bool drawGizmos = false;
 
     public int attackDamage = 4;
     public int health = 20;
+    public int maxHealth;
 
     private bool alive = true;
     private Vector3 originalPosition;
@@ -36,7 +38,7 @@ public class WolfHeadController : AttackablePawn
     // Start is called before the first frame update
     void Start()
     {
-
+        maxHealth = health;
     }
 
     // Update is called once per frame
@@ -88,6 +90,14 @@ public class WolfHeadController : AttackablePawn
         }
     }
 
+    public void RandomFlipSprite()
+    {
+        if(Random.Range(0, 10) > 5)
+        {
+            gameObject.transform.localScale = new Vector3(-1, 1, 1);
+        }
+    }
+
     public void OnCollisionEnter2D(Collision2D collision)
     {
         if (collision.gameObject.tag == "Player")
@@ -135,9 +145,26 @@ public class WolfHeadController : AttackablePawn
 
     private void OnDrawGizmos()
     {
-        return;
+        if (!drawGizmos)
+            return;
         if (cowHead != null && isPlayerVisible)
            Gizmos.DrawLine(transform.position, cowHead.transform.position);
+    }
+
+    public void Respawn()
+    {
+        alive = true;
+        health = maxHealth;
+        gameObject.transform.position = originalPosition;
+        animator.enabled = transform;
+        gameObject.GetComponent<SpriteRenderer>().sprite = null;
+        foreach (BoxCollider2D boxCollider2D in gameObject.GetComponentsInChildren<BoxCollider2D>())
+        {
+            boxCollider2D.enabled = true;
+        }
+        animator.SetFloat("Speed", 0f);
+        animator.SetBool("InFistAttackRange", false);
+        animator.SetBool("Dead", false);
     }
 
     // ---------------------------- OVERRIDE ATTACKABLE PAWN ----------------------------
@@ -152,6 +179,7 @@ public class WolfHeadController : AttackablePawn
     {
         weapon.enableDamage = false;
         weapon.singleRoundHit.Clear();
+        gameObject.transform.localScale = Vector3.one;
     }
 
     public override void CauseDamage()

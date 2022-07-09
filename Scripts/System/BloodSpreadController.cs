@@ -25,6 +25,6 @@ public class BloodSpreadController : MonoBehaviour
         GameObject blood = Instantiate(bloodSpriteList[index], gameObject.transform);
         blood.transform.position = position;
         blood.transform.up = rotation;
-        print("blood spread!");
+        // print("blood spread!");
     }
 }
