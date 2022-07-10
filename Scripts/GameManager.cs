@@ -4,6 +4,9 @@ using UnityEngine;
 
 public class GameManager : MonoBehaviour
 {
+
+    public CowHeadController cowHead;
+
     // Singleton Pattern
     private static GameManager _instance;
     public static GameManager instance
@@ -24,19 +27,29 @@ public class GameManager : MonoBehaviour
         {
             _instance = this;
         }
+
     }
 
+    public bool playerAlive = true;
 
 
-    // Start is called before the first frame update
     void Start()
     {
         // Cursor.visible = false;
     }
 
-    // Update is called once per frame
     void Update()
     {
-        
+        if (Input.GetKeyDown(KeyCode.R) && !cowHead.alive) {
+            playerAlive = true;
+            cowHead.Respawn();
+        }
+        if (Input.GetKeyDown(KeyCode.U))
+        {
+            foreach (GameObject enemy in GameObject.FindGameObjectsWithTag("Enemy"))
+            {
+                enemy.SendMessage("Respawn");
+            } 
+        }
     }
 }

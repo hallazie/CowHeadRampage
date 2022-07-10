@@ -12,7 +12,7 @@ public class CowHeadController : AttackablePawn
     public Animator animator;
     public Weapon weapon;
     public Sprite deadSprite;
-    public float Speed = 5f;
+    public float speed = 5f;
     public bool alive;
 
     public int attackDamage = 10;
@@ -60,7 +60,7 @@ public class CowHeadController : AttackablePawn
     {
         if (!alive)
             return;
-        transform.position += new Vector3(status.horizontalSpeed * Time.deltaTime * Speed, status.verticalSpeed * Time.deltaTime * Speed, 0);
+        transform.position += new Vector3(status.horizontalSpeed * Time.deltaTime * speed, status.verticalSpeed * Time.deltaTime * speed, 0);
         transform.up = status.lookAtPosition;
     }
 

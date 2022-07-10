@@ -14,16 +14,19 @@ public class WolfHeadController : AttackablePawn
     public float sprintFactor = 1.5f;
     public float visionRange = 16f;
     public float sprintRange = 8f;
-    public float fistAttackRange = 2f;
+    public float fistAttackRange = 0.5f;
     public bool drawGizmos = false;
 
     public int attackDamage = 4;
     public int health = 20;
     public int maxHealth;
+    public float attackGap = 0.8f;
 
     private bool alive = true;
     private Vector3 originalPosition;
     private bool collideWithPlayer = false;
+    private float nextAttackTime = 0f;
+    private bool allowAttack;
 
     private bool isPlayerVisible = false;
 
@@ -53,8 +56,9 @@ public class WolfHeadController : AttackablePawn
             return;
         }
         isPlayerVisible = IsPlayerVisible();
+        // Vector3 distance = cowHead.GetComponent<BoxCollider2D>().transform.position - gameObject.GetComponent<BoxCollider2D>().transform.position;
         Vector3 distance = cowHead.transform.position - gameObject.transform.position;
-        // print("distance: " + distance.magnitude.ToString() + ", visionRange: " + visionRange.ToString() + ", attackRange: " + fistAttackRange.ToString());
+        print("distance: " + distance.magnitude.ToString() + ", visionRange: " + visionRange.ToString() + ", attackRange: " + fistAttackRange.ToString());
         Vector3 target = new Vector3(distance.normalized.x * runSpeed * Time.deltaTime, distance.normalized.y * runSpeed * Time.deltaTime, 0);
         if (isPlayerVisible && distance.magnitude < visionRange && distance.magnitude > fistAttackRange)
         {
@@ -74,14 +78,24 @@ public class WolfHeadController : AttackablePawn
         }
         else if (distance.magnitude <= fistAttackRange)
         {
-            transform.up = target.normalized;
-            animator.SetFloat("Speed", 0);
-            animator.SetBool("InFistAttackRange", true);
+            if (Time.time > nextAttackTime)
+            {
+                nextAttackTime = Time.time + attackGap;
+                animator.SetBool("AllowAttack", true);
+                animator.SetFloat("Speed", 0);
+                animator.SetBool("InFistAttackRange", true);
+                CauseDamage();
+            }
+            else
+            {
+                animator.SetFloat("Speed", 0);
+                animator.SetBool("InFistAttackRange", true);
+            }
             if (!collideWithPlayer)
             {
                 transform.position += target;
             }
-            CauseDamage();
+
         }
         else
         {
@@ -177,6 +191,7 @@ public class WolfHeadController : AttackablePawn
 
     public override void StopAttack()
     {
+        allowAttack = false;
         weapon.enableDamage = false;
         weapon.singleRoundHit.Clear();
         gameObject.transform.localScale = Vector3.one;

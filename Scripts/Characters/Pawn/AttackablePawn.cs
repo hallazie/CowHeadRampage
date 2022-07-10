@@ -4,8 +4,10 @@ using UnityEngine;
 
 public abstract class AttackablePawn : MonoBehaviour
 {
+    // animation event
     public abstract void StartAttack();
 
+    // animation event
     public abstract void StopAttack();
 
     public abstract void ReceiveDamage(MessageReceiveDamage message);
