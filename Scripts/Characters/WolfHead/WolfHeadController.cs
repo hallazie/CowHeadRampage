@@ -2,6 +2,18 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+public class WolfHeadState
+{
+    public float health = 0f;
+    public float moveSpeed = 0f;
+    public Vector3 distance = Vector3.zero;
+    public Vector3 target = Vector3.zero;
+    public bool playerVisible = false;
+    public bool allowAttack = false;
+    public bool dead = false;
+
+}
+
 public class WolfHeadController : AttackablePawn
 {
 
@@ -9,6 +21,8 @@ public class WolfHeadController : AttackablePawn
     public Animator animator;
     public Weapon weapon;
     public Sprite deadSprite;
+    public WolfHeadAnimationController animationController;
+    public WolfHeadState states;
 
     public float runSpeed = 1f;
     public float sprintFactor = 1.5f;
@@ -22,19 +36,17 @@ public class WolfHeadController : AttackablePawn
     public int maxHealth;
     public float attackGap = 0.8f;
 
-    private bool alive = true;
     private Vector3 originalPosition;
     private bool collideWithPlayer = false;
     private float nextAttackTime = 0f;
-    private bool allowAttack;
-
-    private bool isPlayerVisible = false;
 
     private void Awake()
     {
         weapon = GetComponentInChildren<Weapon>();
         weapon.Init(attackDamage: attackDamage);
         cowHead = GameObject.Find("CowHead");
+        animationController = new WolfHeadAnimationController(this, animator);
+        states = new WolfHeadState();
         originalPosition = gameObject.transform.position;
     }
 
@@ -44,10 +56,9 @@ public class WolfHeadController : AttackablePawn
         maxHealth = health;
     }
 
-    // Update is called once per frame
     void Update()
     {
-        if (!alive)
+        if (states.dead)
             return;
         if (!GameManager.instance.playerAlive)
         {
@@ -55,52 +66,44 @@ public class WolfHeadController : AttackablePawn
             animator.SetBool("InFistAttackRange", false);
             return;
         }
-        isPlayerVisible = IsPlayerVisible();
-        // Vector3 distance = cowHead.GetComponent<BoxCollider2D>().transform.position - gameObject.GetComponent<BoxCollider2D>().transform.position;
-        Vector3 distance = cowHead.transform.position - gameObject.transform.position;
-        print("distance: " + distance.magnitude.ToString() + ", visionRange: " + visionRange.ToString() + ", attackRange: " + fistAttackRange.ToString());
-        Vector3 target = new Vector3(distance.normalized.x * runSpeed * Time.deltaTime, distance.normalized.y * runSpeed * Time.deltaTime, 0);
-        if (isPlayerVisible && distance.magnitude < visionRange && distance.magnitude > fistAttackRange)
+        UpdateStates();
+        UpdateMovement();
+        animationController.UpdateAnimationParameter();
+    }
+
+    private void UpdateStates()
+    {
+        states.health = health;
+        states.playerVisible = IsPlayerVisible();
+        states.distance = cowHead.transform.position - gameObject.transform.position;
+        states.target = new Vector3(states.distance.normalized.x * runSpeed * Time.deltaTime, states.distance.normalized.y * runSpeed * Time.deltaTime, 0);
+    }
+
+    private void UpdateMovement()
+    {
+        if (states.playerVisible && states.distance.magnitude < visionRange && states.distance.magnitude > fistAttackRange)
         {
-            if (distance.magnitude > sprintRange)
+            // can see player, go chase
+            if (states.distance.magnitude > sprintRange)
             {
-                target *= sprintFactor;
-                animator.SetFloat("Speed", 1.5f);
+                states.target *= sprintFactor;
             }
-            else
-            {
-                animator.SetFloat("Speed", 1f);
-            }
-            transform.up = target.normalized;
-            transform.position += target;
-            
-            animator.SetBool("InFistAttackRange", false);
+            transform.up = states.target.normalized;
+            transform.position += states.target;
         }
-        else if (distance.magnitude <= fistAttackRange)
+        else if (states.distance.magnitude <= fistAttackRange)
         {
+            // can attack palyer
             if (Time.time > nextAttackTime)
             {
-                nextAttackTime = Time.time + attackGap;
-                animator.SetBool("AllowAttack", true);
-                animator.SetFloat("Speed", 0);
-                animator.SetBool("InFistAttackRange", true);
+                // wait amount of time
+                states.allowAttack = true;
                 CauseDamage();
             }
             else
             {
-                animator.SetFloat("Speed", 0);
-                animator.SetBool("InFistAttackRange", true);
+                states.allowAttack = false;
             }
-            if (!collideWithPlayer)
-            {
-                transform.position += target;
-            }
-
-        }
-        else
-        {
-            animator.SetFloat("Speed", 0);
-            animator.SetBool("InFistAttackRange", false);
         }
     }
 
@@ -133,6 +136,9 @@ public class WolfHeadController : AttackablePawn
         Vector3 direction = cowHead.transform.position - transform.position;
         direction.z = 0;
 
+        if (direction.magnitude > visionRange)
+            return false;
+
         RaycastHit2D[] hits;
         hits = Physics2D.RaycastAll(
             origin: new Vector2(transform.position.x, transform.position.y),
@@ -145,11 +151,11 @@ public class WolfHeadController : AttackablePawn
         }
         foreach (RaycastHit2D hit in hits)
         {
-            if (hit.transform.parent != null && (hit.transform.parent.gameObject.tag == "Player" || hit.transform.parent.gameObject.tag == "Enemy"))
+            if (hit.transform.parent != null && (hit.transform.parent.gameObject.layer == GameManager.instance.layerDict["Player"] || hit.transform.parent.gameObject.layer == GameManager.instance.layerDict["Enemy"]))
             {
                 continue;
             }
-            if (hit.transform.gameObject.tag != "Player" && hit.transform.gameObject.tag != "Enemy")
+            if (hit.transform.gameObject.layer != GameManager.instance.layerDict["Player"] && hit.transform.gameObject.layer != GameManager.instance.layerDict["Enemy"])
             {
                 return false;
             }
@@ -161,13 +167,18 @@ public class WolfHeadController : AttackablePawn
     {
         if (!drawGizmos)
             return;
-        if (cowHead != null && isPlayerVisible)
+        if (cowHead != null && states.playerVisible)
            Gizmos.DrawLine(transform.position, cowHead.transform.position);
+    }
+
+    public void StopAnimation()
+    {
+        animationController.StopAnimation();
     }
 
     public void Respawn()
     {
-        alive = true;
+        states.dead = false;
         health = maxHealth;
         gameObject.transform.position = originalPosition;
         animator.enabled = transform;
@@ -176,9 +187,6 @@ public class WolfHeadController : AttackablePawn
         {
             boxCollider2D.enabled = true;
         }
-        animator.SetFloat("Speed", 0f);
-        animator.SetBool("InFistAttackRange", false);
-        animator.SetBool("Dead", false);
     }
 
     // ---------------------------- OVERRIDE ATTACKABLE PAWN ----------------------------
@@ -191,7 +199,8 @@ public class WolfHeadController : AttackablePawn
 
     public override void StopAttack()
     {
-        allowAttack = false;
+        nextAttackTime = Time.time + attackGap;
+        states.allowAttack = false;
         weapon.enableDamage = false;
         weapon.singleRoundHit.Clear();
         gameObject.transform.localScale = Vector3.one;
@@ -208,8 +217,8 @@ public class WolfHeadController : AttackablePawn
         if (health <= 0)
         {
             health = 0;
-            animator.SetBool("Dead", true);
-            alive = false;
+            animationController.PlayAnimation("WH_Die", overwrite: true);
+            states.dead = true;
         }
     }
 

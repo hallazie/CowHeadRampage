@@ -32,6 +32,11 @@ public class GameManager : MonoBehaviour
 
     public bool playerAlive = true;
 
+    public Dictionary<string, int> layerDict = new Dictionary<string, int>{
+        {"Player", 8 },
+        {"Enemy", 9 },
+    };
+
 
     void Start()
     {

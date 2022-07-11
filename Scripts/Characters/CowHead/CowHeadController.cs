@@ -77,7 +77,7 @@ public class CowHeadController : AttackablePawn
     public void Respawn()
     {
         /*
-         复活，类似MH中按R复活
+         复活，类似HM中按R复活
          */
         alive = true;
         health = maxHealth;
