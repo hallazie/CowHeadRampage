@@ -2,13 +2,13 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class WolfHeadAnimationStates
+static class WolfHeadAnimationStates
 {
-    public string Die = "WH_Die";
-    public string FistAttack = "WH_FistAttack";
-    public string Idle = "WH_Idle";
-    public string Run = "WH_Run";
-    public string Sprint = "WH_Sprint";
+    public const string Die = "WH_Die";
+    public const string FistAttack = "WH_FistAttack";
+    public const string Idle = "WH_Idle";
+    public const string Run = "WH_Run";
+    public const string Sprint = "WH_Sprint";
 }
 
 public class WolfHeadAnimationController
@@ -17,7 +17,6 @@ public class WolfHeadAnimationController
     public WolfHeadController controller;
     public Animator upperBodyAnimator;
 
-    private WolfHeadAnimationStates animationStates;
     private string currentAnimationName;
     private string previousAnimationName;
     private bool isPlaying;
@@ -26,47 +25,45 @@ public class WolfHeadAnimationController
     {
         this.controller = controller;
         this.upperBodyAnimator = upperBodyAnimator;
-        this.animationStates = new WolfHeadAnimationStates();
     }
 
     public void UpdateAnimationParameter()
     {
-        if (controller.states.dead)
+        if (!controller.states.alive)
         {
-            PlayAnimation(animationStates.Die);
+            PlayAnimation(WolfHeadAnimationStates.Die);
             return;
         }
         if (controller.states.playerVisible)
         {
             if (controller.states.distance.magnitude > controller.sprintRange)
             {
-                PlayAnimation(animationStates.Sprint);
+                PlayAnimation(WolfHeadAnimationStates.Sprint);
             }
             else if (controller.states.distance.magnitude >= controller.fistAttackRange && controller.states.distance.magnitude < controller.sprintRange)
             {
-                PlayAnimation(animationStates.Run);
+                PlayAnimation(WolfHeadAnimationStates.Run);
             }
             else if(controller.states.distance.magnitude < controller.fistAttackRange)
             {
                 if (controller.states.allowAttack)
                 {
-                    PlayAnimation(animationStates.FistAttack);
+                    PlayAnimation(WolfHeadAnimationStates.FistAttack);
                 }
                 else
                 {
-                    PlayAnimation(animationStates.Idle);
+                    PlayAnimation(WolfHeadAnimationStates.Idle);
                 }
             }
             else
             {
-                PlayAnimation(animationStates.Idle);
+                PlayAnimation(WolfHeadAnimationStates.Idle);
             }
         }
         else
         {
-            PlayAnimation(animationStates.Idle);
+            PlayAnimation(WolfHeadAnimationStates.Idle);
         }
-
     }
 
     public void StopAnimation()
@@ -78,7 +75,7 @@ public class WolfHeadAnimationController
 
     public void PlayAnimation(string animationName, bool overwrite = false)
     {
-        if ((currentAnimationName == animationStates.Run || currentAnimationName == animationStates.Idle) && (animationName != animationStates.Run && animationName != animationStates.Idle))
+        if ((currentAnimationName == WolfHeadAnimationStates.Run || currentAnimationName == WolfHeadAnimationStates.Idle) && (animationName != WolfHeadAnimationStates.Run && animationName != WolfHeadAnimationStates.Idle))
         {
             overwrite = true;
         }

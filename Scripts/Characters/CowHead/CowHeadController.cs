@@ -2,22 +2,37 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+public class CowHeadState
+{
+
+    public bool alive;
+    public float health;
+
+    public float horizontalSpeed;
+    public float verticalSpeed;
+    public float moveSpeed;
+
+    public Vector2 lookAtPosition;
+
+    public bool attack;
+
+}
+
 
 public class CowHeadController : AttackablePawn
 {
 
-    private CowHeadStatus status = new CowHeadStatus();
+    public CowHeadAnimationController animationController;
+    public CowHeadState states;
 
     public BloodSpreadController bloodSpreadController;
     public Animator animator;
     public Weapon weapon;
     public Sprite deadSprite;
-    public float speed = 5f;
-    public bool alive;
+    public float runSpeed = 5f;
 
     public int attackDamage = 10;
-    public int health = 100;
-    public int maxHealth;
+    public int maxHealth = 100;
 
     public delegate void AttackDelegate();
     public AttackDelegate attackDelegate;
@@ -27,51 +42,62 @@ public class CowHeadController : AttackablePawn
     {
         weapon = GetComponentInChildren<Weapon>();
         weapon.Init(attackDamage: attackDamage);
-        alive = true;
+        states = new CowHeadState();
+        animationController = new CowHeadAnimationController(this, animator);
     }
 
     // Start is called before the first frame update
     void Start()
     {
-        maxHealth = health;   
+        states.alive = true;
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (!alive)
+        if (!states.alive)
             return;
-        status.horizontalSpeed = Input.GetAxisRaw("Horizontal");
-        status.verticalSpeed = Input.GetAxisRaw("Vertical");
-        status.speed = Mathf.Sqrt(status.horizontalSpeed * status.horizontalSpeed + status.verticalSpeed * status.verticalSpeed);
-        status.attack = Input.GetMouseButtonDown(0) || status.attack;
-        status.lookAtPosition = ((Vector2) Camera.main.ScreenToWorldPoint(Input.mousePosition) - (Vector2) transform.position).normalized;
 
-        UpdateAnimationByCHStatus();
+        UpdateStates();
+        UpdateMovement();
+        animationController.UpdateAnimationParameter();
 
-        if (status.attack)
-        {
-            CauseDamage();
-        }
+    }
+
+    private void UpdateStates()
+    {
+        states.horizontalSpeed = Input.GetAxisRaw("Horizontal");
+        states.verticalSpeed = Input.GetAxisRaw("Vertical");
+        states.moveSpeed = Mathf.Sqrt(states.horizontalSpeed * states.horizontalSpeed + states.verticalSpeed * states.verticalSpeed);
+        states.attack = Input.GetMouseButtonDown(0) || states.attack;
+        states.lookAtPosition = ((Vector2)Camera.main.ScreenToWorldPoint(Input.mousePosition) - (Vector2)transform.position).normalized;
+
+    }
+
+    private void UpdateMovement()
+    {
+        /*
+         update movements in fixed update
+         */
+        transform.position += new Vector3(states.horizontalSpeed * Time.deltaTime * runSpeed, states.verticalSpeed * Time.deltaTime * runSpeed, 0);
+        transform.up = states.lookAtPosition;
 
     }
 
     private void FixedUpdate()
     {
-        if (!alive)
+        if (!states.alive)
             return;
-        transform.position += new Vector3(status.horizontalSpeed * Time.deltaTime * speed, status.verticalSpeed * Time.deltaTime * speed, 0);
-        transform.up = status.lookAtPosition;
+        UpdateMovement();
+        if (states.attack)
+        {
+            CauseDamage();
+        }
     }
 
-    private void UpdateAnimationByCHStatus()
+    public void StopAnimation()
     {
-        /*
-         使用script替代animation状态机，获得更好的控制
-         */
-        status.ResolveStatusConflict();
-        animator.SetFloat("Speed", status.speed);
-        animator.SetBool("Attack", status.attack);
+        animationController.StopAnimation();
     }
 
     public void Respawn()
@@ -79,8 +105,8 @@ public class CowHeadController : AttackablePawn
         /*
          复活，类似HM中按R复活
          */
-        alive = true;
-        health = maxHealth;
+        states.alive = true;
+        states.health = maxHealth;
         animator.enabled = true;
         gameObject.GetComponent<SpriteRenderer>().sortingLayerName = "Player";
         gameObject.GetComponent<SpriteRenderer>().sprite = null;
@@ -88,16 +114,14 @@ public class CowHeadController : AttackablePawn
         {
             boxCollider2D.enabled = true;
         }
-        animator.SetFloat("Speed", 0f);
-        animator.SetBool("Attack", false);
-        animator.SetBool("Dead", false);
+
     }
 
     // ---------------------------- OVERRIDE ATTACKABLE PAWN ----------------------------
 
     public override void StopAttack()
     {
-        status.attack = false;
+        states.attack = false;
         weapon.enableDamage = false;
         weapon.singleRoundHit.Clear();
     }
@@ -115,13 +139,13 @@ public class CowHeadController : AttackablePawn
 
     public override void ReceiveDamage(MessageReceiveDamage message)
     {
-        health -= message.damageAmount;
-        if (health <= 0)
+        states.health -= message.damageAmount;
+        if (states.health <= 0)
         {
-            health = 0;
-            animator.SetBool("Dead", true);
-            alive = false;
+            states.health = 0;
+            states.alive = false;
             GameManager.instance.playerAlive = false;
+            animationController.PlayAnimation(CowHeadAnimationStates.Die, overwrite: true);
         }
         // FloatingTextManager.instance.ShowBasic("health: " + health.ToString(), Color.yellow, transform.position, Vector3.up * 32, duration: 5f);
     }

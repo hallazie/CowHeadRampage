@@ -173,12 +173,11 @@ MonoBehaviour:
   sprintFactor: 1.5
   visionRange: 10
   sprintRange: 6
-  fistAttackRange: 3.5
+  fistAttackRange: 3.475
   drawGizmos: 0
   attackDamage: 10
-  health: 20
-  maxHealth: 0
-  attackGap: 0.8
+  maxHealth: 30
+  attackGap: 0.6
 --- !u!1 &1698532945638168398
 GameObject:
   m_ObjectHideFlags: 0
@@ -253,7 +252,7 @@ BoxCollider2D:
   m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: 0.00040340424, y: 0.0017186999}
+  m_Offset: {x: -0.0007687807, y: 0.03500224}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
@@ -264,7 +263,7 @@ BoxCollider2D:
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 0.1742723, y: 0.18274605}
+  m_Size: {x: 0.26863438, y: 0.291969}
   m_EdgeRadius: 0
 --- !u!212 &3160734863151366833
 SpriteRenderer:

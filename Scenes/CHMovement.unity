@@ -1094,7 +1094,12 @@ PrefabInstance:
     - target: {fileID: 4497666583675543936, guid: ff9c3f2b7f84d2943bff03a480f35c06,
         type: 3}
       propertyPath: attackGap
-      value: 1.8
+      value: 0.6
+      objectReference: {fileID: 0}
+    - target: {fileID: 4497666583675543936, guid: ff9c3f2b7f84d2943bff03a480f35c06,
+        type: 3}
+      propertyPath: maxHealth
+      value: 20
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: ff9c3f2b7f84d2943bff03a480f35c06, type: 3}
@@ -1420,25 +1425,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: CowHead
       objectReference: {fileID: 0}
-    - target: {fileID: 3459735840184223319, guid: 1eba003912f66054fa1e41e853335af0,
-        type: 3}
-      propertyPath: m_TagString
-      value: Player
-      objectReference: {fileID: 0}
-    - target: {fileID: 3459735841430631538, guid: 1eba003912f66054fa1e41e853335af0,
-        type: 3}
-      propertyPath: m_IsTrigger
-      value: 0
-      objectReference: {fileID: 0}
     - target: {fileID: 7892022146293225683, guid: 1eba003912f66054fa1e41e853335af0,
         type: 3}
       propertyPath: bloodSpreadController
       value: 
       objectReference: {fileID: 1083292114}
-    - target: {fileID: 7892022146293225683, guid: 1eba003912f66054fa1e41e853335af0,
-        type: 3}
-      propertyPath: maxHealth
-      value: 1000
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 1eba003912f66054fa1e41e853335af0, type: 3}

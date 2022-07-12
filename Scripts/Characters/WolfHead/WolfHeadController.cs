@@ -10,7 +10,7 @@ public class WolfHeadState
     public Vector3 target = Vector3.zero;
     public bool playerVisible = false;
     public bool allowAttack = false;
-    public bool dead = false;
+    public bool alive = true;
 
 }
 
@@ -32,8 +32,7 @@ public class WolfHeadController : AttackablePawn
     public bool drawGizmos = false;
 
     public int attackDamage = 4;
-    public int health = 20;
-    public int maxHealth;
+    public float maxHealth = 20;
     public float attackGap = 0.8f;
 
     private Vector3 originalPosition;
@@ -53,12 +52,12 @@ public class WolfHeadController : AttackablePawn
     // Start is called before the first frame update
     void Start()
     {
-        maxHealth = health;
+        states.health = maxHealth;
     }
 
     void Update()
     {
-        if (states.dead)
+        if (!states.alive)
             return;
         if (!GameManager.instance.playerAlive)
         {
@@ -73,7 +72,6 @@ public class WolfHeadController : AttackablePawn
 
     private void UpdateStates()
     {
-        states.health = health;
         states.playerVisible = IsPlayerVisible();
         states.distance = cowHead.transform.position - gameObject.transform.position;
         states.target = new Vector3(states.distance.normalized.x * runSpeed * Time.deltaTime, states.distance.normalized.y * runSpeed * Time.deltaTime, 0);
@@ -178,8 +176,8 @@ public class WolfHeadController : AttackablePawn
 
     public void Respawn()
     {
-        states.dead = false;
-        health = maxHealth;
+        states.alive = true;
+        states.health = maxHealth;
         gameObject.transform.position = originalPosition;
         animator.enabled = transform;
         gameObject.GetComponent<SpriteRenderer>().sprite = null;
@@ -213,12 +211,12 @@ public class WolfHeadController : AttackablePawn
 
     public override void ReceiveDamage(MessageReceiveDamage message)
     {
-        health -= message.damageAmount;
-        if (health <= 0)
+        states.health -= message.damageAmount;
+        if (states.health <= 0)
         {
-            health = 0;
-            animationController.PlayAnimation("WH_Die", overwrite: true);
-            states.dead = true;
+            states.health = 0;
+            animationController.PlayAnimation(WolfHeadAnimationStates.Die, overwrite: true);
+            states.alive = false;
         }
     }
 

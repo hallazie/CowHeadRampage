@@ -45,7 +45,7 @@ public class GameManager : MonoBehaviour
 
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.R) && !cowHead.alive) {
+        if (Input.GetKeyDown(KeyCode.R) && !cowHead.states.alive) {
             playerAlive = true;
             cowHead.Respawn();
         }
