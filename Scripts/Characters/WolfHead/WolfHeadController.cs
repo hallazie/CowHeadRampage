@@ -11,6 +11,7 @@ public class WolfHeadState
     public bool playerVisible = false;
     public bool allowAttack = false;
     public bool alive = true;
+    public int hostilityLevel = 1;                   // 0: friend, 1: neutral, 2: hostile, 3: enemy
 
 }
 
@@ -18,6 +19,8 @@ public class WolfHeadController : AttackablePawn
 {
 
     public GameObject cowHead;
+    public GameObject interactionManager;
+
     public Animator animator;
     public Weapon weapon;
     public Sprite deadSprite;
@@ -30,6 +33,8 @@ public class WolfHeadController : AttackablePawn
     public float sprintRange = 8f;
     public float fistAttackRange = 0.5f;
     public bool drawGizmos = false;
+    public float interactRange = 4f;
+    public float gizmosRange = 4f;
 
     public int attackDamage = 4;
     public float maxHealth = 20;
@@ -43,7 +48,10 @@ public class WolfHeadController : AttackablePawn
     {
         weapon = GetComponentInChildren<Weapon>();
         weapon.Init(attackDamage: attackDamage);
+
         cowHead = GameObject.Find("CowHead");
+        interactionManager = GameObject.Find("InteractionManager");
+
         animationController = new WolfHeadAnimationController(this, animator);
         states = new WolfHeadState();
         originalPosition = gameObject.transform.position;
@@ -59,50 +67,56 @@ public class WolfHeadController : AttackablePawn
     {
         if (!states.alive)
             return;
-        if (!GameManager.instance.playerAlive)
-        {
-            animator.SetFloat("Speed", 0f);
-            animator.SetBool("InFistAttackRange", false);
-            return;
-        }
+
         UpdateStates();
         UpdateMovement();
         animationController.UpdateAnimationParameter();
+        UpdateInteraction();
     }
 
     private void UpdateStates()
     {
         states.playerVisible = IsPlayerVisible();
         states.distance = cowHead.transform.position - gameObject.transform.position;
+        states.distance.z = 0f;
         states.target = new Vector3(states.distance.normalized.x * runSpeed * Time.deltaTime, states.distance.normalized.y * runSpeed * Time.deltaTime, 0);
     }
 
     private void UpdateMovement()
     {
-        if (states.playerVisible && states.distance.magnitude < visionRange && states.distance.magnitude > fistAttackRange)
+        if (states.hostilityLevel == 3)
         {
-            // can see player, go chase
-            if (states.distance.magnitude > sprintRange)
+            // 敌对模式
+            if (states.playerVisible && states.distance.magnitude < visionRange && states.distance.magnitude > fistAttackRange)
             {
-                states.target *= sprintFactor;
+                // can see player, go chase
+                if (states.distance.magnitude > sprintRange)
+                {
+                    states.target *= sprintFactor;
+                }
+                transform.up = states.target.normalized;
+                transform.position += states.target;
             }
-            transform.up = states.target.normalized;
-            transform.position += states.target;
+            else if (states.distance.magnitude <= fistAttackRange)
+            {
+                // can attack palyer
+                if (Time.time > nextAttackTime)
+                {
+                    // wait amount of time
+                    states.allowAttack = true;
+                    CauseDamage();
+                }
+                else
+                {
+                    states.allowAttack = false;
+                }
+            }
         }
-        else if (states.distance.magnitude <= fistAttackRange)
+        else if (states.hostilityLevel == 1)
         {
-            // can attack palyer
-            if (Time.time > nextAttackTime)
-            {
-                // wait amount of time
-                states.allowAttack = true;
-                CauseDamage();
-            }
-            else
-            {
-                states.allowAttack = false;
-            }
+            // 中立模式
         }
+
     }
 
     public void RandomFlipSprite()
@@ -131,6 +145,11 @@ public class WolfHeadController : AttackablePawn
 
     private bool IsPlayerVisible()
     {
+        if (!GameManager.instance.cowHead.states.alive)
+        {
+            return false;
+        }
+
         Vector3 direction = cowHead.transform.position - transform.position;
         direction.z = 0;
 
@@ -167,6 +186,8 @@ public class WolfHeadController : AttackablePawn
             return;
         if (cowHead != null && states.playerVisible)
            Gizmos.DrawLine(transform.position, cowHead.transform.position);
+        Gizmos.DrawWireSphere(transform.position, gizmosRange);
+
     }
 
     public void StopAnimation()
@@ -181,9 +202,22 @@ public class WolfHeadController : AttackablePawn
         gameObject.transform.position = originalPosition;
         animator.enabled = transform;
         gameObject.GetComponent<SpriteRenderer>().sprite = null;
+        gameObject.GetComponent<SpriteRenderer>().sortingLayerName = "Enemy";
         foreach (BoxCollider2D boxCollider2D in gameObject.GetComponentsInChildren<BoxCollider2D>())
         {
             boxCollider2D.enabled = true;
+        }
+    }
+
+    public void UpdateInteraction()
+    {
+        if (states.distance.magnitude < interactRange)
+        {
+            InteractionSelectorManager.instance.StartIntereaction(this.gameObject);
+        }
+        else
+        {
+            InteractionSelectorManager.instance.StopInteraction();
         }
     }
 
@@ -229,6 +263,7 @@ public class WolfHeadController : AttackablePawn
     {
         animator.enabled = false;
         gameObject.GetComponent<SpriteRenderer>().sprite = deadSprite;
+        gameObject.GetComponent<SpriteRenderer>().sortingLayerName = "Default";
         foreach (BoxCollider2D boxCollider2D in gameObject.GetComponentsInChildren<BoxCollider2D>())
         {
             boxCollider2D.enabled = false;

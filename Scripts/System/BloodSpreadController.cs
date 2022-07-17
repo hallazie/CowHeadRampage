@@ -23,6 +23,7 @@ public class BloodSpreadController : MonoBehaviour
     {
         int index = Random.Range(0, bloodSpriteList.Count);
         GameObject blood = Instantiate(bloodSpriteList[index], gameObject.transform);
+        blood.GetComponent<SpriteRenderer>().sortingLayerName = "Default";
         blood.transform.position = position;
         blood.transform.up = rotation;
         // print("blood spread!");

@@ -50,6 +50,7 @@ public class CowHeadController : AttackablePawn
     void Start()
     {
         states.alive = true;
+        states.health = maxHealth;
     }
 
     // Update is called once per frame
@@ -108,6 +109,7 @@ public class CowHeadController : AttackablePawn
         states.alive = true;
         states.health = maxHealth;
         animator.enabled = true;
+        GameManager.instance.playerAlive = true;
         gameObject.GetComponent<SpriteRenderer>().sortingLayerName = "Player";
         gameObject.GetComponent<SpriteRenderer>().sprite = null;
         foreach (BoxCollider2D boxCollider2D in gameObject.GetComponentsInChildren<BoxCollider2D>())

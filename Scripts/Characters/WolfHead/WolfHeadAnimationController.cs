@@ -31,10 +31,14 @@ public class WolfHeadAnimationController
     {
         if (!controller.states.alive)
         {
-            PlayAnimation(WolfHeadAnimationStates.Die);
+            PlayAnimation(WolfHeadAnimationStates.Die, true);
             return;
         }
-        if (controller.states.playerVisible)
+        if (!GameManager.instance.cowHead.states.alive)
+        {
+            PlayAnimation(WolfHeadAnimationStates.Idle);
+        }
+        if (controller.states.playerVisible && controller.states.hostilityLevel == 3)
         {
             if (controller.states.distance.magnitude > controller.sprintRange)
             {
@@ -75,6 +79,7 @@ public class WolfHeadAnimationController
 
     public void PlayAnimation(string animationName, bool overwrite = false)
     {
+        Debug.Log("playing: " + animationName + ", current: " + currentAnimationName + ", previous: " + previousAnimationName);
         if ((currentAnimationName == WolfHeadAnimationStates.Run || currentAnimationName == WolfHeadAnimationStates.Idle) && (animationName != WolfHeadAnimationStates.Run && animationName != WolfHeadAnimationStates.Idle))
         {
             overwrite = true;

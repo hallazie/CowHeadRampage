@@ -12,6 +12,7 @@ public class FloatingText
     public Vector3 motion;
     public float duration;
     public float lastShown;
+    public bool constant;
 
     public void Show()
     {
@@ -30,7 +31,10 @@ public class FloatingText
 
     public void PlayTextAnimation()
     {
-        FloatingDisappear();
+        if (!constant)
+        {
+            FloatingDisappear();
+        }
     }
 
     public void UpdateFloatingText()

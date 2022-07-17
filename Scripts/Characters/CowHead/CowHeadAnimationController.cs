@@ -9,6 +9,12 @@ static class CowHeadAnimationStates
     public const string Run = "CH_Walk";
     public const string AttackWalk = "CH_Attack_Walk";
     public const string Die = "CH_Die";
+
+    public const string UpperWalk = "UpperWalk";
+    public const string UpperIdle = "UpperIdle";
+
+    public const string LowerWalk = "LowerWalk";
+    public const string LowerIdle = "LowerIdle";
 }
 
 
@@ -47,7 +53,6 @@ public class CowHeadAnimationController
         {
             PlayAnimation(CowHeadAnimationStates.Idle);
         }
-
     }
 
     public void StopAnimation()
@@ -60,6 +65,10 @@ public class CowHeadAnimationController
     public void PlayAnimation(string animationName, bool overwrite = false)
     {
         if ((currentAnimationName == CowHeadAnimationStates.Run || currentAnimationName == CowHeadAnimationStates.Idle) && (animationName != CowHeadAnimationStates.Run && animationName != CowHeadAnimationStates.Idle))
+        {
+            overwrite = true;
+        }
+        if (animationName != currentAnimationName)
         {
             overwrite = true;
         }

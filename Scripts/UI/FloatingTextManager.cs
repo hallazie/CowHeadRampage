@@ -78,4 +78,15 @@ public class FloatingTextManager : MonoBehaviour
         floatingText.duration = duration;
         floatingText.Show();
     }
+
+    public void ShowConstant(string message, Color color, Vector3 position, int fontSize = 16)
+    {
+        FloatingText floatingText = GetFloatingText();
+        floatingText.text.text = message;
+        floatingText.text.fontSize = fontSize;
+        floatingText.text.color = color;
+        floatingText.constant = true;
+        floatingText.gameObj.transform.position = Camera.main.WorldToScreenPoint(position);
+        floatingText.Show();
+    }
 }
