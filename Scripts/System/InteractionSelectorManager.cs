@@ -9,8 +9,8 @@ public class InteractionSelectorManager : MonoBehaviour
     public CowHeadController cowHead;
 
     public bool active = false;
-    public Vector3 offset = new Vector3(1, 1, 0);
-    public float currentTargetDistance;
+    public Vector3 offset = new Vector3(0.5f, 0.5f, 0);
+    public float currentTargetDistance = 1000f;
 
     private static InteractionSelectorManager _instance;
     public static InteractionSelectorManager instance
@@ -41,27 +41,40 @@ public class InteractionSelectorManager : MonoBehaviour
         if (target != null) {
             currentTargetDistance = ((Vector2)(cowHead.transform.position - target.transform.position)).magnitude;
         }
+        if (target.layer == GameManager.instance.layerDict["Enemy"] && target != null && Input.GetKeyDown(KeyCode.E))
+        {
+            target.SendMessage("StartConversation");
+            target.transform.up = (Vector2)(cowHead.transform.position - target.transform.position);
+        }
     }
 
     public void StartIntereaction(GameObject target)
     {
-        if (target == this.target && active)
-            return;
-        if (target != this.target && ((Vector2)(cowHead.transform.position - target.transform.position)).magnitude < currentTargetDistance)
-            return;
-        this.target = target;
-        active = true;
-        this.gameObject.SetActive(active);
-        this.transform.position = target.transform.position + offset;
+        float newDistance = ((Vector2)(cowHead.transform.position - target.transform.position)).magnitude;
+
+        if (target != this.target && (this.target == null || newDistance < currentTargetDistance))
+        {
+            this.target = target;
+            gameObject.GetComponent<SpriteRenderer>().enabled = true;
+            active = true;
+            transform.position = target.transform.position + offset;
+            currentTargetDistance = ((Vector2)(cowHead.transform.position - this.target.transform.position)).magnitude;
+        }
+        else if(target == this.target)
+        {
+            transform.position = target.transform.position + offset;
+        }
     }
 
-    public void StopInteraction()
+    public void StopInteraction(GameObject target)
     {
         if (!active)
             return;
-        target = null;
+        if (active && target != this.target)
+            return;
+        this.target = null;
         active = false;
-        this.gameObject.SetActive(active);
+        gameObject.GetComponent<SpriteRenderer>().enabled = false;
     }
 
 }

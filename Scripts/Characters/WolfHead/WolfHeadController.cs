@@ -26,15 +26,17 @@ public class WolfHeadController : AttackablePawn
     public Sprite deadSprite;
     public WolfHeadAnimationController animationController;
     public WolfHeadState states;
+    public Rigidbody2D rgdbody;
 
+    public string characterType = "WolfHead";
     public float runSpeed = 1f;
     public float sprintFactor = 1.5f;
     public float visionRange = 16f;
     public float sprintRange = 8f;
     public float fistAttackRange = 0.5f;
     public bool drawGizmos = false;
-    public float interactRange = 4f;
-    public float gizmosRange = 4f;
+    public float interactRange = 1f;
+    public float gizmosRange = 1f;
 
     public int attackDamage = 4;
     public float maxHealth = 20;
@@ -51,6 +53,9 @@ public class WolfHeadController : AttackablePawn
 
         cowHead = GameObject.Find("CowHead");
         interactionManager = GameObject.Find("InteractionManager");
+
+        rgdbody = GetComponent<Rigidbody2D>();
+        
 
         animationController = new WolfHeadAnimationController(this, animator);
         states = new WolfHeadState();
@@ -118,6 +123,29 @@ public class WolfHeadController : AttackablePawn
         }
 
     }
+    public void UpdateInteraction()
+    {
+        if (states.distance.magnitude < interactRange && states.hostilityLevel < 2)
+        {
+            InteractionSelectorManager.instance.StartIntereaction(this.gameObject);
+        }
+        else
+        {
+            InteractionSelectorManager.instance.StopInteraction(this.gameObject);
+        }
+    }
+
+    public void OnCollisionEnter2D(Collision2D collision)
+    {
+        return;
+        if (collision.gameObject.tag == "Player")
+        {
+            Vector2 force = -1 * (Vector2)(collision.transform.position - transform.position);
+            rgdbody.AddForce(force) ;
+        }
+    }
+
+    // ===================================================================
 
     public void RandomFlipSprite()
     {
@@ -127,21 +155,22 @@ public class WolfHeadController : AttackablePawn
         }
     }
 
-    public void OnCollisionEnter2D(Collision2D collision)
+    public void StartConversation()
     {
-        if (collision.gameObject.tag == "Player")
+        if (states.hostilityLevel < 2)
         {
-            collideWithPlayer = true;
+            DialogueManager.instance.StartDialogue(gameObject);
         }
     }
 
-    public void OnCollisionExit2D(Collision2D collision)
+    public void StopConversation()
     {
-        if (collision.gameObject.tag == "Player")
-        {
-            collideWithPlayer = false;
-        }
+        DialogueManager.instance.EndDialogue();
+        GameManager.instance.BroadcastEnemyHostility();
+        // states.hostilityLevel = 3;
+        // StartCoroutine(DelayExecuting(1));
     }
+
 
     private bool IsPlayerVisible()
     {
@@ -209,16 +238,12 @@ public class WolfHeadController : AttackablePawn
         }
     }
 
-    public void UpdateInteraction()
+    // ---------------------------- OTHERS ----------------------------
+
+    IEnumerator DelayExecuting(float second)
     {
-        if (states.distance.magnitude < interactRange)
-        {
-            InteractionSelectorManager.instance.StartIntereaction(this.gameObject);
-        }
-        else
-        {
-            InteractionSelectorManager.instance.StopInteraction();
-        }
+        yield return new WaitForSeconds(second);
+        states.hostilityLevel = 3;
     }
 
     // ---------------------------- OVERRIDE ATTACKABLE PAWN ----------------------------
@@ -245,6 +270,8 @@ public class WolfHeadController : AttackablePawn
 
     public override void ReceiveDamage(MessageReceiveDamage message)
     {
+        GameManager.instance.BroadcastEnemyHostility();
+
         states.health -= message.damageAmount;
         if (states.health <= 0)
         {

@@ -79,7 +79,7 @@ public class WolfHeadAnimationController
 
     public void PlayAnimation(string animationName, bool overwrite = false)
     {
-        Debug.Log("playing: " + animationName + ", current: " + currentAnimationName + ", previous: " + previousAnimationName);
+        // Debug.Log("playing: " + animationName + ", current: " + currentAnimationName + ", previous: " + previousAnimationName);
         if ((currentAnimationName == WolfHeadAnimationStates.Run || currentAnimationName == WolfHeadAnimationStates.Idle) && (animationName != WolfHeadAnimationStates.Run && animationName != WolfHeadAnimationStates.Idle))
         {
             overwrite = true;

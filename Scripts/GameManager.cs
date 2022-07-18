@@ -57,4 +57,17 @@ public class GameManager : MonoBehaviour
             } 
         }
     }
+
+    public void BroadcastEnemyHostility()
+    {
+        WolfHeadController[] wolfHeadList = FindObjectsOfType<WolfHeadController>();
+        foreach (WolfHeadController wolfHead in wolfHeadList)
+        {
+            if (wolfHead.states.playerVisible)
+            {
+                wolfHead.states.hostilityLevel = 3;
+            }
+        }
+    }
+
 }

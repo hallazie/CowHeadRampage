@@ -6,6 +6,7 @@ public class CowHeadState
 {
 
     public bool alive;
+    public bool occupied;
     public float health;
 
     public float horizontalSpeed;
@@ -29,8 +30,10 @@ public class CowHeadController : AttackablePawn
     public Animator animator;
     public Weapon weapon;
     public Sprite deadSprite;
-    public float runSpeed = 5f;
+    public Rigidbody2D rgdbody;
 
+    public string characterType = "CowHead";
+    public float runSpeed = 5f;
     public int attackDamage = 10;
     public int maxHealth = 100;
 
@@ -43,6 +46,9 @@ public class CowHeadController : AttackablePawn
         weapon = GetComponentInChildren<Weapon>();
         weapon.Init(attackDamage: attackDamage);
         states = new CowHeadState();
+
+        rgdbody = GetComponent<Rigidbody2D>();
+
         animationController = new CowHeadAnimationController(this, animator);
     }
 
@@ -56,13 +62,24 @@ public class CowHeadController : AttackablePawn
     // Update is called once per frame
     void Update()
     {
-        if (!states.alive)
+        if (!states.alive || states.occupied)
             return;
 
         UpdateStates();
         UpdateMovement();
         animationController.UpdateAnimationParameter();
 
+    }
+
+    private void FixedUpdate()
+    {
+        if (!states.alive || states.occupied)
+            return;
+        UpdateMovement();
+        if (states.attack)
+        {
+            CauseDamage();
+        }
     }
 
     private void UpdateStates()
@@ -80,20 +97,23 @@ public class CowHeadController : AttackablePawn
         /*
          update movements in fixed update
          */
+
+        if (states.occupied)
+            return;
+
         transform.position += new Vector3(states.horizontalSpeed * Time.deltaTime * runSpeed, states.verticalSpeed * Time.deltaTime * runSpeed, 0);
         transform.up = states.lookAtPosition;
 
     }
 
-    private void FixedUpdate()
+    public void StartConversation()
     {
-        if (!states.alive)
-            return;
-        UpdateMovement();
-        if (states.attack)
-        {
-            CauseDamage();
-        }
+        states.occupied = true;
+    }
+
+    public void StopConversation()
+    {
+        states.occupied = false;
     }
 
     public void StopAnimation()

@@ -10,10 +10,10 @@ GameObject:
   m_Component:
   - component: {fileID: 1485445418320543928}
   - component: {fileID: 1485445418320543929}
+  - component: {fileID: 4497666583675543936}
   - component: {fileID: 1485445418320543927}
   - component: {fileID: 1485445418320543926}
   - component: {fileID: 1485445418320543925}
-  - component: {fileID: 4497666583675543936}
   m_Layer: 9
   m_Name: WolfHead
   m_TagString: Enemy
@@ -55,6 +55,35 @@ Animator:
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorControllerStateOnDisable: 0
+--- !u!114 &4497666583675543936
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1485445418320543930}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6694818dc366c5646b9a96e96d25e579, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  cowHead: {fileID: 0}
+  interactionManager: {fileID: 0}
+  animator: {fileID: 1485445418320543929}
+  weapon: {fileID: 7197047881220640872}
+  deadSprite: {fileID: 21300000, guid: e2a2b15a444b5314e96a593502079ee1, type: 3}
+  characterType: WolfHead
+  runSpeed: 3
+  sprintFactor: 1.5
+  visionRange: 10
+  sprintRange: 6
+  fistAttackRange: 0.5
+  drawGizmos: 0
+  interactRange: 1
+  gizmosRange: 2
+  attackDamage: 10
+  maxHealth: 30
+  attackGap: 0.6
 --- !u!212 &1485445418320543927
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -153,31 +182,6 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 0
---- !u!114 &4497666583675543936
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1485445418320543930}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6694818dc366c5646b9a96e96d25e579, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  cowHead: {fileID: 0}
-  animator: {fileID: 1485445418320543929}
-  weapon: {fileID: 7197047881220640872}
-  deadSprite: {fileID: 21300000, guid: e2a2b15a444b5314e96a593502079ee1, type: 3}
-  runSpeed: 3
-  sprintFactor: 1.5
-  visionRange: 10
-  sprintRange: 6
-  fistAttackRange: 3.475
-  drawGizmos: 0
-  attackDamage: 10
-  maxHealth: 30
-  attackGap: 0.6
 --- !u!1 &1698532945638168398
 GameObject:
   m_ObjectHideFlags: 0
