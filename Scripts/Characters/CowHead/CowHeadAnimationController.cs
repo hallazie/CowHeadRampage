@@ -10,11 +10,8 @@ static class CowHeadAnimationStates
     public const string AttackWalk = "CH_Attack_Walk";
     public const string Die = "CH_Die";
 
-    public const string UpperWalk = "UpperWalk";
-    public const string UpperIdle = "UpperIdle";
-
-    public const string LowerWalk = "LowerWalk";
-    public const string LowerIdle = "LowerIdle";
+    public const string Combo1 = "CH_Combo1";
+    public const string Combo2 = "CH_Combo2";
 }
 
 
@@ -40,9 +37,14 @@ public class CowHeadAnimationController
         {
             return;
         }
-        if (controller.states.attack)
+        if (controller.states.attack && controller.states.comboStep == 0)
         {
-            PlayAnimation(CowHeadAnimationStates.AttackWalk, true);
+            PlayAnimation(CowHeadAnimationStates.Combo1, false);
+            return;
+        }
+        else if(controller.states.attack && controller.states.comboStep == 1)
+        {
+            PlayAnimation(CowHeadAnimationStates.Combo2, false);
             return;
         }
         if (controller.states.moveSpeed > 0)
@@ -70,7 +72,14 @@ public class CowHeadAnimationController
         }
         if (animationName != currentAnimationName)
         {
-            overwrite = true;
+            if(animationName == CowHeadAnimationStates.Combo1 && currentAnimationName == CowHeadAnimationStates.Combo2 || animationName == CowHeadAnimationStates.Combo2 && currentAnimationName == CowHeadAnimationStates.Combo1)
+            {
+                overwrite = false;
+            }
+            else
+            {
+                overwrite = true;
+            }
         }
         if (isPlaying && !overwrite)
         {

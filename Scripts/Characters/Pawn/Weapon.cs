@@ -63,7 +63,7 @@ public class Weapon : MonoBehaviour
                 {
                     FloatingTextManager.instance.ShowBasic("-" + attackDamage.ToString(), Color.red, gameObject.transform.position, Vector3.up * 64, duration: 2f, fontSize: 16);
                     weaponHits[i].gameObject.SendMessage("ReceiveDamage", new MessageReceiveDamage(attackDamage));
-                    gameObject.transform.parent.SendMessage("AttackEffect", new MessageAttackEffect(origin: transform.position, target:weaponHits[i].transform.position));
+                    gameObject.transform.parent.SendMessage("AttackEffect", new MessageAttackEffect(origin: transform.parent.position, target:weaponHits[i].transform.position));
                     singleRoundHit.Add(weaponHits[i].gameObject);
                 }
 

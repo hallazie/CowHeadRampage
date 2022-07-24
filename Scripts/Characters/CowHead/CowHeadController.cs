@@ -7,15 +7,18 @@ public class CowHeadState
 
     public bool alive;
     public bool occupied;
-    public float health;
+    public bool freezeMovement;
+    public bool attack;
 
     public float horizontalSpeed;
     public float verticalSpeed;
     public float moveSpeed;
+    public float health;
+    public float lastAttackTime;
 
     public Vector2 lookAtPosition;
 
-    public bool attack;
+    public int comboStep;
 
 }
 
@@ -35,6 +38,7 @@ public class CowHeadController : AttackablePawn
     public string characterType = "CowHead";
     public float runSpeed = 5f;
     public int attackDamage = 10;
+    public float attackGap = 0.5f;
     public int maxHealth = 100;
 
     public delegate void AttackDelegate();
@@ -98,7 +102,7 @@ public class CowHeadController : AttackablePawn
          update movements in fixed update
          */
 
-        if (states.occupied)
+        if (states.occupied || states.freezeMovement)
             return;
 
         transform.position += new Vector3(states.horizontalSpeed * Time.deltaTime * runSpeed, states.verticalSpeed * Time.deltaTime * runSpeed, 0);
@@ -139,6 +143,16 @@ public class CowHeadController : AttackablePawn
 
     }
 
+    public void FreezeMovement()
+    {
+        states.freezeMovement = true;
+    }
+
+    public void UnfreezeMovement()
+    {
+        states.freezeMovement = false;
+    }
+
     // ---------------------------- OVERRIDE ATTACKABLE PAWN ----------------------------
 
     public override void StopAttack()
@@ -146,6 +160,13 @@ public class CowHeadController : AttackablePawn
         states.attack = false;
         weapon.enableDamage = false;
         weapon.singleRoundHit.Clear();
+        if (states.comboStep == 0)
+        {
+            states.comboStep = 1;
+        }else if (states.comboStep == 1)
+        {
+            states.comboStep = 0;
+        }
     }
 
     public override void StartAttack()
@@ -174,9 +195,10 @@ public class CowHeadController : AttackablePawn
 
     public override void AttackEffect(MessageAttackEffect message)
     {
-        Vector3 direction = (message.target - message.origin).normalized;
+        Vector3 direction = (message.target - message.origin);
         direction.z = 0;
-        Vector3 position = new Vector3(message.target.x + direction.x * 5, message.target.y + direction.y * 5, 0);
+        direction = direction.normalized;
+        Vector3 position = new Vector3(message.target.x + direction.x, message.target.y + direction.y, 0);
         bloodSpreadController.DrawBloodSpread(position, direction);
     }
 
