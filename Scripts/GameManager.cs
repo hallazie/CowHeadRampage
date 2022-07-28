@@ -7,6 +7,10 @@ public class GameManager : MonoBehaviour
 
     public CowHeadController cowHead;
 
+    public EffectDisplayController effectDisplayController;
+    public CameraShake cameraShaker;
+
+
     // Singleton Pattern
     private static GameManager _instance;
     public static GameManager instance
@@ -56,6 +60,11 @@ public class GameManager : MonoBehaviour
                 enemy.SendMessage("Respawn");
             } 
         }
+    }
+
+    public void ShakeCamera(float duration = 0.15f, float magnitude = 0.05f, int frameGap = 10)
+    {
+        StartCoroutine(cameraShaker.Shake(duration, magnitude, frameGap));
     }
 
     public void BroadcastEnemyHostility()

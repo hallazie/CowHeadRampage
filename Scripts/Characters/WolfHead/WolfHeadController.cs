@@ -12,7 +12,9 @@ public class WolfHeadState
     public bool allowAttack = false;
     public bool alive = true;
     public int hostilityLevel = 1;                   // 0: friend, 1: neutral, 2: hostile, 3: enemy
-
+    public bool allowAim = false;                    // 是否开始进入瞄准姿态
+    public bool allowShoot = false;                  // 是否可进行射击
+    public bool attackMode = false;
 }
 
 public class WolfHeadController : AttackablePawn
@@ -20,6 +22,7 @@ public class WolfHeadController : AttackablePawn
 
     public GameObject cowHead;
     public GameObject interactionManager;
+    public GameObject bulletPrefab;
 
     public Animator animator;
     public Weapon weapon;
@@ -37,19 +40,30 @@ public class WolfHeadController : AttackablePawn
     public bool drawGizmos = false;
     public float interactRange = 1f;
     public float gizmosRange = 1f;
+    public float hostileDuration = 5f;
 
-    public int attackDamage = 4;
+    public float shootProbability = 0.5f;
+    public float aimingMinTime = 0.5f;
+    public float aimingMaxTime = 2f;
+
+    public int attackDamage = 10;
+    public float pistolDamage = 5f;
     public float maxHealth = 20;
     public float attackGap = 0.8f;
 
     private Vector3 originalPosition;
-    private bool collideWithPlayer = false;
     private float nextAttackTime = 0f;
+    private float lastSawPlayerTime = 0f;
+    private float lastShootTime = 0f;
+    private float currentAimingTime = 0f;
+
+    // weapon attrs
+    public Color fistDamageColor = Color.red;
 
     private void Awake()
     {
         weapon = GetComponentInChildren<Weapon>();
-        weapon.Init(attackDamage: attackDamage);
+        weapon.Init(attackDamage: attackDamage, fontColor: fistDamageColor);
 
         cowHead = GameObject.Find("CowHead");
         interactionManager = GameObject.Find("InteractionManager");
@@ -82,6 +96,38 @@ public class WolfHeadController : AttackablePawn
     private void UpdateStates()
     {
         states.playerVisible = IsPlayerVisible();
+        if (!states.playerVisible)
+        {
+            // 丢失目标
+            if(Time.time - lastSawPlayerTime >= hostileDuration)
+            {
+                states.hostilityLevel = 1;
+            }
+            states.allowAim = false;
+            states.allowShoot = false;
+            states.attackMode = false;
+        }
+        else
+        {
+            // 目标可见
+            lastSawPlayerTime = Time.time;
+            float shootProb = Random.Range(0f, 1f);
+            if (!states.attackMode && shootProb <= shootProbability )
+            {
+                states.allowAim = true;
+                states.attackMode = true;
+                lastShootTime = Time.time;
+                currentAimingTime = Random.Range(aimingMinTime, aimingMaxTime);
+            }
+            if (states.hostilityLevel > 1)
+            {
+                states.attackMode = true;
+            }
+        }
+        if (states.allowAim && !states.allowShoot && Time.time - lastShootTime > currentAimingTime)
+        {
+            states.allowShoot = true;
+        }
         states.distance = cowHead.transform.position - gameObject.transform.position;
         states.distance.z = 0f;
         states.target = new Vector3(states.distance.normalized.x * runSpeed * Time.deltaTime, states.distance.normalized.y * runSpeed * Time.deltaTime, 0);
@@ -92,7 +138,11 @@ public class WolfHeadController : AttackablePawn
         if (states.hostilityLevel == 3)
         {
             // 敌对模式
-            if (states.playerVisible && states.distance.magnitude < visionRange && states.distance.magnitude > fistAttackRange)
+            if (states.allowAim)
+            {
+                transform.up = states.target.normalized;
+            }
+            else if (states.playerVisible && states.distance.magnitude < visionRange && states.distance.magnitude > fistAttackRange)
             {
                 // can see player, go chase
                 if (states.distance.magnitude > sprintRange)
@@ -137,13 +187,21 @@ public class WolfHeadController : AttackablePawn
 
     public void OnCollisionEnter2D(Collision2D collision)
     {
-        return;
-        if (collision.gameObject.tag == "Player")
+        if (collision.gameObject.layer == GameManager.instance.layerDict["Player"])
         {
-            Vector2 force = -1 * (Vector2)(collision.transform.position - transform.position);
-            rgdbody.AddForce(force) ;
+            rgdbody.constraints = RigidbodyConstraints2D.FreezeAll;
         }
     }
+
+    public void OnCollisionExit2D(Collision2D collision)
+    {
+        if (collision.gameObject.layer == GameManager.instance.layerDict["Player"])
+        {
+            rgdbody.constraints = RigidbodyConstraints2D.None;
+        }
+    }
+
+
 
     // ===================================================================
 
@@ -240,10 +298,22 @@ public class WolfHeadController : AttackablePawn
 
     // ---------------------------- OTHERS ----------------------------
 
-    IEnumerator DelayExecuting(float second)
+    public void StartShoot()
     {
-        yield return new WaitForSeconds(second);
-        states.hostilityLevel = 3;
+        GameObject bullet = Instantiate(bulletPrefab, gameObject.transform.position, Quaternion.identity);
+        bullet.name = "Bullet";
+        bullet.tag = "Bullet";
+        MessageInstantiateBullet bulletMessage = new MessageInstantiateBullet(cowHead.tag, gameObject.tag, cowHead.transform.position, transform.position, pistolDamage);
+        bullet.SendMessage("Init", bulletMessage);
+    }
+
+    public void StopShoot()
+    {
+        states.allowAim = true;
+        states.allowShoot = false;
+        states.attackMode = false;
+        lastShootTime = Time.time;
+        currentAimingTime = Random.Range(aimingMinTime, aimingMaxTime);
     }
 
     // ---------------------------- OVERRIDE ATTACKABLE PAWN ----------------------------

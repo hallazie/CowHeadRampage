@@ -14,6 +14,7 @@ GameObject:
   - component: {fileID: 3459735840180077376}
   - component: {fileID: 3459735840180077377}
   - component: {fileID: 2012358721}
+  - component: {fileID: 1834993736}
   m_Layer: 8
   m_Name: CowHead
   m_TagString: Player
@@ -49,13 +50,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 708adc69007018140a287bdf4d4236bd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  bloodSpreadController: {fileID: 0}
   animator: {fileID: 2012358721}
   weapon: {fileID: 2151512672803709662}
   deadSprite: {fileID: 21300000, guid: 6510b2c431246564caa4ba7bea63d441, type: 3}
-  runSpeed: 5
+  rgdbody: {fileID: 3459735840180077377}
+  characterType: CowHead
+  runSpeed: 10
   attackDamage: 10
-  maxHealth: 100
+  attackGap: 0.5
+  maxHealth: 30
+  knifeDamageColor: {r: 0, g: 0, b: 1, a: 1}
 --- !u!212 &3459735840180077379
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -75,7 +79,7 @@ SpriteRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 10754, guid: 0000000000000000f000000000000000, type: 0}
+  - {fileID: 2100000, guid: a97c105638bdf8b4a8650670310a4cd3, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -94,7 +98,7 @@ SpriteRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: -1869315837
-  m_SortingLayer: 4
+  m_SortingLayer: 5
   m_SortingOrder: 0
   m_Sprite: {fileID: 21300000, guid: 9087a01f42a9b364787d0acf14ff6f9c, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -120,7 +124,7 @@ BoxCollider2D:
   m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: -0.035333008, y: -0.19049692}
+  m_Offset: {x: -0.024315715, y: -0.19710761}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
@@ -131,7 +135,7 @@ BoxCollider2D:
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 0.929334, y: 0.36811447}
+  m_Size: {x: 1.0791678, y: 0.5003208}
   m_EdgeRadius: 0
 --- !u!50 &3459735840180077377
 Rigidbody2D:
@@ -173,6 +177,34 @@ Animator:
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorControllerStateOnDisable: 0
+--- !u!114 &1834993736
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3459735840180077390}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7db70e0ea77f5ac47a8f4565a9406397, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_ShadowGroup: 0
+  m_HasRenderer: 1
+  m_UseRendererSilhouette: 1
+  m_CastsShadows: 1
+  m_SelfShadows: 0
+  m_ApplyToSortingLayers: 00000000d3a595dd8f8c2dc0b391b5f9c93960fd0381949059dc53bc15c73cdf
+  m_ShapePath:
+  - {x: -0.54588056, y: -0.4077996, z: 0}
+  - {x: -0.0527775, y: -0.5350156, z: 0.000000059604645}
+  - {x: 0.46183085, y: -0.38378555, z: 0}
+  - {x: 0.44382036, y: -0.066477954, z: 0}
+  - {x: -0.0407705, y: 0.083346605, z: 0.000000059604645}
+  - {x: -0.55188406, y: -0.10249913, z: 0}
+  m_ShapePathHash: 1002558475
+  m_Mesh: {fileID: 0}
+  m_InstanceId: -114910
 --- !u!1 &3459735840184223319
 GameObject:
   m_ObjectHideFlags: 0
@@ -242,13 +274,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3459735841430631536}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: 0, y: 0, z: 0.73439723, w: 0.6787199}
   m_LocalPosition: {x: -0.0187, y: -0.2369, z: 0}
   m_LocalScale: {x: 4.141591, y: 0.63710994, z: 1}
   m_Children: []
   m_Father: {fileID: 3459735840180077378}
   m_RootOrder: 1
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 94.513}
 --- !u!61 &3459735841430631538
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -262,7 +294,7 @@ BoxCollider2D:
   m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: 0.005376052, y: 0.0062794983}
+  m_Offset: {x: 0.0038253707, y: 0.0062794983}
   m_SpriteTilingProperty:
     border: {x: 0.049999997, y: 0.049999997, z: 0.049999997, w: 0.049999997}
     pivot: {x: 0.5, y: 0.5}
@@ -273,7 +305,7 @@ BoxCollider2D:
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 0.20537227, y: 0.24479002}
+  m_Size: {x: 0.03863257, y: 0.24479002}
   m_EdgeRadius: 0
 --- !u!114 &2151512672803709662
 MonoBehaviour:
@@ -303,6 +335,7 @@ MonoBehaviour:
     minNormalAngle: 0
     maxNormalAngle: 0
   attackDamage: 10
+  fontColor: {r: 0, g: 0, b: 0, a: 0}
 --- !u!212 &4910026689713036761
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -322,7 +355,7 @@ SpriteRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 10754, guid: 0000000000000000f000000000000000, type: 0}
+  - {fileID: 2100000, guid: a97c105638bdf8b4a8650670310a4cd3, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0

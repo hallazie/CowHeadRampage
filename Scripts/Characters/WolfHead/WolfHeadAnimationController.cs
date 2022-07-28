@@ -9,6 +9,8 @@ static class WolfHeadAnimationStates
     public const string Idle = "WH_Idle";
     public const string Run = "WH_Run";
     public const string Sprint = "WH_Sprint";
+    public const string Aim = "WH_Aim";
+    public const string Shoot = "WH_Shoot";
 }
 
 public class WolfHeadAnimationController
@@ -40,28 +42,43 @@ public class WolfHeadAnimationController
         }
         if (controller.states.playerVisible && controller.states.hostilityLevel == 3)
         {
-            if (controller.states.distance.magnitude > controller.sprintRange)
+            // wolfhead进入攻击模式
+            if (controller.states.allowAim)
             {
-                PlayAnimation(WolfHeadAnimationStates.Sprint);
-            }
-            else if (controller.states.distance.magnitude >= controller.fistAttackRange && controller.states.distance.magnitude < controller.sprintRange)
-            {
-                PlayAnimation(WolfHeadAnimationStates.Run);
-            }
-            else if(controller.states.distance.magnitude < controller.fistAttackRange)
-            {
-                if (controller.states.allowAttack)
+                if (controller.states.allowShoot)
                 {
-                    PlayAnimation(WolfHeadAnimationStates.FistAttack);
+                    PlayAnimation(WolfHeadAnimationStates.Shoot);
+                }
+                else
+                {
+                    PlayAnimation(WolfHeadAnimationStates.Aim);
+                }
+            }
+            else
+            {
+                if (controller.states.distance.magnitude > controller.sprintRange)
+                {
+                    PlayAnimation(WolfHeadAnimationStates.Sprint);
+                }
+                else if (controller.states.distance.magnitude >= controller.fistAttackRange && controller.states.distance.magnitude < controller.sprintRange)
+                {
+                    PlayAnimation(WolfHeadAnimationStates.Run);
+                }
+                else if (controller.states.distance.magnitude < controller.fistAttackRange)
+                {
+                    if (controller.states.allowAttack)
+                    {
+                        PlayAnimation(WolfHeadAnimationStates.FistAttack);
+                    }
+                    else
+                    {
+                        PlayAnimation(WolfHeadAnimationStates.Idle);
+                    }
                 }
                 else
                 {
                     PlayAnimation(WolfHeadAnimationStates.Idle);
                 }
-            }
-            else
-            {
-                PlayAnimation(WolfHeadAnimationStates.Idle);
             }
         }
         else

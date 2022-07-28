@@ -21,18 +21,22 @@ public class Weapon : MonoBehaviour
     public HashSet<GameObject> singleRoundHit = new HashSet<GameObject>();
 
     public int attackDamage;
+    public Color fontColor;
 
     private Collider2D[] weaponHits = new Collider2D[10];
     private bool enableDamage_ = false;
 
-    public void Init(int attackDamage)
+    public void Init(int attackDamage, Color fontColor)
     {
         this.attackDamage = attackDamage;
+        this.fontColor = fontColor;
     }
 
     private void Awake()
     {
-        weaponCollider = gameObject.GetComponent<BoxCollider2D>();        
+        weaponCollider = gameObject.GetComponent<BoxCollider2D>();
+        weaponContactFilter.useTriggers = true;
+        Physics2D.IgnoreCollision(weaponCollider, gameObject.transform.parent.GetComponent<BoxCollider2D>());
     }
 
     // Start is called before the first frame update
@@ -52,18 +56,34 @@ public class Weapon : MonoBehaviour
 
     } 
 
-    public void OnAttack(string targetTag)
+    public void OnAttack(string targetTag, bool sendDamage = true, bool sendAttackEffect = true, bool showDamage = true)
     {
         if (enableDamage)
         {
             weaponCollider.OverlapCollider(weaponContactFilter, weaponHits);
             for (int i = 0; i < weaponHits.Length; i++)
             {
+                if (weaponHits[i] != null && weaponHits[i].gameObject != null && weaponHits[i].gameObject.tag == transform.parent.tag)
+                {
+                    continue;
+                }
+                if (weaponHits[i] != null)
+                    print("current parent: " + transform.parent.name + ", tag: " + transform.parent.tag + ", sending damage to: " + weaponHits[i].name + ", tag: " + weaponHits[i].tag + " != " + targetTag);
                 if (weaponHits[i] != null && weaponHits[i].tag == targetTag && !singleRoundHit.Contains(weaponHits[i].gameObject))
                 {
-                    FloatingTextManager.instance.ShowBasic("-" + attackDamage.ToString(), Color.red, gameObject.transform.position, Vector3.up * 64, duration: 2f, fontSize: 16);
-                    weaponHits[i].gameObject.SendMessage("ReceiveDamage", new MessageReceiveDamage(attackDamage));
-                    gameObject.transform.parent.SendMessage("AttackEffect", new MessageAttackEffect(origin: transform.parent.position, target:weaponHits[i].transform.position));
+                    if (showDamage)
+                    {
+                        FloatingTextManager.instance.ShowBasic("-" + attackDamage.ToString(), fontColor, gameObject.transform.position, Vector3.up * 64, duration: 2f, fontSize: 32);
+                    }
+                    if (sendDamage)
+                    {
+                        
+                        weaponHits[i].gameObject.SendMessage("ReceiveDamage", new MessageReceiveDamage(attackDamage));
+                    }
+                    if (sendAttackEffect)
+                    {
+                        gameObject.transform.parent.SendMessage("AttackEffect", new MessageAttackEffect(origin: transform.parent.position, target: weaponHits[i].transform.position, contactPosition: Vector3.zero));
+                    }
                     singleRoundHit.Add(weaponHits[i].gameObject);
                 }
 

@@ -14,6 +14,7 @@ GameObject:
   - component: {fileID: 1485445418320543927}
   - component: {fileID: 1485445418320543926}
   - component: {fileID: 1485445418320543925}
+  - component: {fileID: 4340856177732918976}
   m_Layer: 9
   m_Name: WolfHead
   m_TagString: Enemy
@@ -69,9 +70,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   cowHead: {fileID: 0}
   interactionManager: {fileID: 0}
+  bulletPrefab: {fileID: 3441851654430969908, guid: 6b6d1192e44606541af88bdcbaf42176,
+    type: 3}
   animator: {fileID: 1485445418320543929}
   weapon: {fileID: 7197047881220640872}
   deadSprite: {fileID: 21300000, guid: e2a2b15a444b5314e96a593502079ee1, type: 3}
+  rgdbody: {fileID: 0}
   characterType: WolfHead
   runSpeed: 3
   sprintFactor: 1.5
@@ -81,9 +85,15 @@ MonoBehaviour:
   drawGizmos: 0
   interactRange: 1
   gizmosRange: 2
+  hostileDuration: 5
+  shootProbability: 0.5
+  aimingMinTime: 0.5
+  aimingMaxTime: 1
   attackDamage: 10
+  pistolDamage: 5
   maxHealth: 30
   attackGap: 0.6
+  fistDamageColor: {r: 1, g: 0, b: 0, a: 1}
 --- !u!212 &1485445418320543927
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -103,7 +113,7 @@ SpriteRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 10754, guid: 0000000000000000f000000000000000, type: 0}
+  - {fileID: 2100000, guid: a97c105638bdf8b4a8650670310a4cd3, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -122,7 +132,7 @@ SpriteRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: -44025399
-  m_SortingLayer: 3
+  m_SortingLayer: 4
   m_SortingOrder: 0
   m_Sprite: {fileID: 21300000, guid: e04a42e0d52c3c54ea1112df6512c6e4, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -182,6 +192,34 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 0
+--- !u!114 &4340856177732918976
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1485445418320543930}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7db70e0ea77f5ac47a8f4565a9406397, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_ShadowGroup: 0
+  m_HasRenderer: 1
+  m_UseRendererSilhouette: 1
+  m_CastsShadows: 1
+  m_SelfShadows: 0
+  m_ApplyToSortingLayers: 00000000d3a595dd8f8c2dc0b391b5f9c93960fd0381949059dc53bc15c73cdf
+  m_ShapePath:
+  - {x: -0.52442086, y: -0.29078534, z: 0}
+  - {x: -0.0777086, y: -0.4252177, z: -0.00000011920929}
+  - {x: 0.3632928, y: -0.26258782, z: 0}
+  - {x: 0.37134922, y: 0.041036904, z: 0}
+  - {x: -0.08173716, y: 0.13470197, z: -0.00000011920929}
+  - {x: -0.5203928, y: 0.0249241, z: 0}
+  m_ShapePathHash: 1472703593
+  m_Mesh: {fileID: 0}
+  m_InstanceId: 30880
 --- !u!1 &1698532945638168398
 GameObject:
   m_ObjectHideFlags: 0
@@ -243,6 +281,7 @@ MonoBehaviour:
     minNormalAngle: 0
     maxNormalAngle: 0
   attackDamage: 0
+  fontColor: {r: 0, g: 0, b: 0, a: 0}
 --- !u!61 &3479296482340801374
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -288,7 +327,7 @@ SpriteRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 10754, guid: 0000000000000000f000000000000000, type: 0}
+  - {fileID: 2100000, guid: a97c105638bdf8b4a8650670310a4cd3, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0

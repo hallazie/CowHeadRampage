@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class CowHeadState
 {
@@ -9,6 +7,7 @@ public class CowHeadState
     public bool occupied;
     public bool freezeMovement;
     public bool attack;
+    public bool sprint;
 
     public float horizontalSpeed;
     public float verticalSpeed;
@@ -29,7 +28,6 @@ public class CowHeadController : AttackablePawn
     public CowHeadAnimationController animationController;
     public CowHeadState states;
 
-    public BloodSpreadController bloodSpreadController;
     public Animator animator;
     public Weapon weapon;
     public Sprite deadSprite;
@@ -37,18 +35,19 @@ public class CowHeadController : AttackablePawn
 
     public string characterType = "CowHead";
     public float runSpeed = 5f;
+    public float sprintMultiplier = 1.5f;
     public int attackDamage = 10;
     public float attackGap = 0.5f;
     public int maxHealth = 100;
 
-    public delegate void AttackDelegate();
-    public AttackDelegate attackDelegate;
+    // weapon attrs
+    public Color knifeDamageColor = Color.blue;
 
 
     private void Awake()
     {
         weapon = GetComponentInChildren<Weapon>();
-        weapon.Init(attackDamage: attackDamage);
+        weapon.Init(attackDamage: attackDamage, fontColor: knifeDamageColor);
         states = new CowHeadState();
 
         rgdbody = GetComponent<Rigidbody2D>();
@@ -68,11 +67,8 @@ public class CowHeadController : AttackablePawn
     {
         if (!states.alive || states.occupied)
             return;
-
         UpdateStates();
-        UpdateMovement();
         animationController.UpdateAnimationParameter();
-
     }
 
     private void FixedUpdate()
@@ -88,6 +84,7 @@ public class CowHeadController : AttackablePawn
 
     private void UpdateStates()
     {
+        states.sprint = Input.GetKey(KeyCode.LeftShift);
         states.horizontalSpeed = Input.GetAxisRaw("Horizontal");
         states.verticalSpeed = Input.GetAxisRaw("Vertical");
         states.moveSpeed = Mathf.Sqrt(states.horizontalSpeed * states.horizontalSpeed + states.verticalSpeed * states.verticalSpeed);
@@ -104,8 +101,14 @@ public class CowHeadController : AttackablePawn
 
         if (states.occupied || states.freezeMovement)
             return;
-
-        transform.position += new Vector3(states.horizontalSpeed * Time.deltaTime * runSpeed, states.verticalSpeed * Time.deltaTime * runSpeed, 0);
+        if (!states.sprint)
+        {
+            transform.position += new Vector3(states.horizontalSpeed * Time.deltaTime * runSpeed, states.verticalSpeed * Time.deltaTime * runSpeed, 0);
+        }
+        else
+        {
+            transform.position += new Vector3(states.horizontalSpeed * Time.deltaTime * runSpeed * sprintMultiplier, states.verticalSpeed * Time.deltaTime * runSpeed * sprintMultiplier, 0);
+        }
         transform.up = states.lookAtPosition;
 
     }
@@ -178,6 +181,7 @@ public class CowHeadController : AttackablePawn
     public override void CauseDamage()
     {
         weapon.OnAttack("Enemy");
+        weapon.OnAttack("Bullet", sendAttackEffect: false, showDamage: false);
     }
 
     public override void ReceiveDamage(MessageReceiveDamage message)
@@ -199,7 +203,10 @@ public class CowHeadController : AttackablePawn
         direction.z = 0;
         direction = direction.normalized;
         Vector3 position = new Vector3(message.target.x + direction.x, message.target.y + direction.y, 0);
-        bloodSpreadController.DrawBloodSpread(position, direction);
+        Vector3 contactProximatePosition = (message.target + message.origin) / 2f;
+        GameManager.instance.effectDisplayController.DrawBloodSpread(position, direction);
+        GameManager.instance.effectDisplayController.PlayBlastEffect(contactProximatePosition);
+        GameManager.instance.ShakeCamera();
     }
 
     public override void Dead()
