@@ -14,7 +14,7 @@ public class WolfHeadState
     public int hostilityLevel = 1;                   // 0: friend, 1: neutral, 2: hostile, 3: enemy
     public bool allowAim = false;                    // 是否开始进入瞄准姿态
     public bool allowShoot = false;                  // 是否可进行射击
-    public bool attackMode = false;
+    public string attackMode = "None";
 }
 
 public class WolfHeadController : AttackablePawn
@@ -25,7 +25,7 @@ public class WolfHeadController : AttackablePawn
     public GameObject bulletPrefab;
 
     public Animator animator;
-    public Weapon weapon;
+    public MeleeWeapon weapon;
     public Sprite deadSprite;
     public WolfHeadAnimationController animationController;
     public WolfHeadState states;
@@ -62,7 +62,7 @@ public class WolfHeadController : AttackablePawn
 
     private void Awake()
     {
-        weapon = GetComponentInChildren<Weapon>();
+        weapon = GetComponentInChildren<MeleeWeapon>();
         weapon.Init(attackDamage: attackDamage, fontColor: fistDamageColor);
 
         cowHead = GameObject.Find("CowHead");
@@ -105,23 +105,28 @@ public class WolfHeadController : AttackablePawn
             }
             states.allowAim = false;
             states.allowShoot = false;
-            states.attackMode = false;
+            states.attackMode = "None";
         }
         else
         {
             // 目标可见
             lastSawPlayerTime = Time.time;
             float shootProb = Random.Range(0f, 1f);
-            if (!states.attackMode && shootProb <= shootProbability )
+            if (states.hostilityLevel > 1 && states.attackMode == "None")
             {
-                states.allowAim = true;
-                states.attackMode = true;
-                lastShootTime = Time.time;
-                currentAimingTime = Random.Range(aimingMinTime, aimingMaxTime);
-            }
-            if (states.hostilityLevel > 1)
-            {
-                states.attackMode = true;
+                if (shootProb <= shootProbability)
+                {
+                    states.allowAim = true;
+                    states.attackMode = "Shoot";
+                    lastShootTime = Time.time;
+                    currentAimingTime = Random.Range(aimingMinTime, aimingMaxTime);
+                }
+                else
+                {
+                    states.allowAim = false;
+                    states.attackMode = "Melee";
+                }
+
             }
         }
         if (states.allowAim && !states.allowShoot && Time.time - lastShootTime > currentAimingTime)
@@ -255,7 +260,15 @@ public class WolfHeadController : AttackablePawn
         }
         foreach (RaycastHit2D hit in hits)
         {
+            if (hit.transform.gameObject == null)
+            {
+                continue;
+            }
             if (hit.transform.parent != null && (hit.transform.parent.gameObject.layer == GameManager.instance.layerDict["Player"] || hit.transform.parent.gameObject.layer == GameManager.instance.layerDict["Enemy"]))
+            {
+                continue;
+            }
+            if (hit.transform.gameObject.tag == "Furniture")
             {
                 continue;
             }
@@ -311,7 +324,7 @@ public class WolfHeadController : AttackablePawn
     {
         states.allowAim = true;
         states.allowShoot = false;
-        states.attackMode = false;
+        states.attackMode = "None";
         lastShootTime = Time.time;
         currentAimingTime = Random.Range(aimingMinTime, aimingMaxTime);
     }
@@ -328,6 +341,7 @@ public class WolfHeadController : AttackablePawn
     {
         nextAttackTime = Time.time + attackGap;
         states.allowAttack = false;
+        states.attackMode = "None";
         weapon.enableDamage = false;
         weapon.singleRoundHit.Clear();
         gameObject.transform.localScale = Vector3.one;
@@ -335,7 +349,7 @@ public class WolfHeadController : AttackablePawn
 
     public override void CauseDamage()
     {
-        weapon.OnAttack("Player");
+        weapon.OnAttack("Player", ignoringTags: new List<string> { "Bullet", "Weapon", "Player", "Enemy" });
     }
 
     public override void ReceiveDamage(MessageReceiveDamage message)
@@ -353,14 +367,26 @@ public class WolfHeadController : AttackablePawn
 
     public override void AttackEffect(MessageAttackEffect message)
     {
-        
+
+    }
+
+    public override void DamagedEffect(MessageAttackEffect message)
+    {
+        Vector3 direction = (message.origin - message.target);
+        direction.z = 0;
+        direction = direction.normalized;
+        Vector3 position = new Vector3(message.target.x - direction.x * 0.3f, message.target.y - direction.y * 0.3f, 0);
+        Vector3 contactProximatePosition = (message.target + message.origin) / 2f;
+        GameManager.instance.effectDisplayController.DrawBloodSpread(position, -1 * direction);
+        GameManager.instance.effectDisplayController.PlayBlastEffect(contactProximatePosition);
+        GameManager.instance.ShakeCamera();
     }
 
     public override void Dead()
     {
         animator.enabled = false;
         gameObject.GetComponent<SpriteRenderer>().sprite = deadSprite;
-        gameObject.GetComponent<SpriteRenderer>().sortingLayerName = "Default";
+        gameObject.GetComponent<SpriteRenderer>().sortingLayerName = "GroundStuff";
         foreach (BoxCollider2D boxCollider2D in gameObject.GetComponentsInChildren<BoxCollider2D>())
         {
             boxCollider2D.enabled = false;

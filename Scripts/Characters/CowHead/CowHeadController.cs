@@ -1,4 +1,6 @@
-﻿using UnityEngine;
+﻿using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
 
 public class CowHeadState
 {
@@ -15,7 +17,8 @@ public class CowHeadState
     public float health;
     public float lastAttackTime;
 
-    public Vector2 lookAtPosition;
+    public Vector2 lookAtDirection;
+    public Vector2 movementDirection;
 
     public int comboStep;
 
@@ -29,9 +32,10 @@ public class CowHeadController : AttackablePawn
     public CowHeadState states;
 
     public Animator animator;
-    public Weapon weapon;
+    public MeleeWeapon weapon;
     public Sprite deadSprite;
     public Rigidbody2D rgdbody;
+    public BoxCollider2D boxCollider;
 
     public string characterType = "CowHead";
     public float runSpeed = 5f;
@@ -46,11 +50,12 @@ public class CowHeadController : AttackablePawn
 
     private void Awake()
     {
-        weapon = GetComponentInChildren<Weapon>();
+        weapon = GetComponentInChildren<MeleeWeapon>();
         weapon.Init(attackDamage: attackDamage, fontColor: knifeDamageColor);
         states = new CowHeadState();
 
         rgdbody = GetComponent<Rigidbody2D>();
+        boxCollider = GetComponent<BoxCollider2D>();
 
         animationController = new CowHeadAnimationController(this, animator);
     }
@@ -88,9 +93,15 @@ public class CowHeadController : AttackablePawn
         states.horizontalSpeed = Input.GetAxisRaw("Horizontal");
         states.verticalSpeed = Input.GetAxisRaw("Vertical");
         states.moveSpeed = Mathf.Sqrt(states.horizontalSpeed * states.horizontalSpeed + states.verticalSpeed * states.verticalSpeed);
-        states.attack = Input.GetMouseButtonDown(0) || states.attack;
-        states.lookAtPosition = ((Vector2)Camera.main.ScreenToWorldPoint(Input.mousePosition) - (Vector2)transform.position).normalized;
+        states.attack = Input.GetMouseButton(0) || Input.GetMouseButtonDown(0) || states.attack;
+        states.lookAtDirection = ((Vector2)Camera.main.ScreenToWorldPoint(Input.mousePosition) - (Vector2)transform.position).normalized;
+        states.movementDirection = new Vector2(states.horizontalSpeed, states.verticalSpeed).normalized;
 
+        float angle = Vector2.Angle(states.lookAtDirection, states.movementDirection);
+        if (angle >= 90)
+        {
+            states.sprint = false;
+        }
     }
 
     private void UpdateMovement()
@@ -109,7 +120,7 @@ public class CowHeadController : AttackablePawn
         {
             transform.position += new Vector3(states.horizontalSpeed * Time.deltaTime * runSpeed * sprintMultiplier, states.verticalSpeed * Time.deltaTime * runSpeed * sprintMultiplier, 0);
         }
-        transform.up = states.lookAtPosition;
+        transform.up = states.lookAtDirection; 
 
     }
 
@@ -174,14 +185,15 @@ public class CowHeadController : AttackablePawn
 
     public override void StartAttack()
     {
+        states.attack = true;
         weapon.enableDamage = true;
         weapon.singleRoundHit.Clear();
     }
 
     public override void CauseDamage()
     {
-        weapon.OnAttack("Enemy");
-        weapon.OnAttack("Bullet", sendAttackEffect: false, showDamage: false);
+        weapon.OnAttack("Enemy", ignoringTags: new List<string> { "Bullet", "Weapon", "Player", "Enemy" });
+        weapon.OnAttack("Bullet", sendDamagedEffect: false, showDamage: false, visualConditional: false);
     }
 
     public override void ReceiveDamage(MessageReceiveDamage message)
@@ -199,20 +211,18 @@ public class CowHeadController : AttackablePawn
 
     public override void AttackEffect(MessageAttackEffect message)
     {
-        Vector3 direction = (message.target - message.origin);
-        direction.z = 0;
-        direction = direction.normalized;
-        Vector3 position = new Vector3(message.target.x + direction.x, message.target.y + direction.y, 0);
-        Vector3 contactProximatePosition = (message.target + message.origin) / 2f;
-        GameManager.instance.effectDisplayController.DrawBloodSpread(position, direction);
-        GameManager.instance.effectDisplayController.PlayBlastEffect(contactProximatePosition);
-        GameManager.instance.ShakeCamera();
+
+    }
+
+    public override void DamagedEffect(MessageAttackEffect message)
+    {
+
     }
 
     public override void Dead()
     {
         animator.enabled = false;
-        gameObject.GetComponent<SpriteRenderer>().sortingLayerName = "Default";
+        gameObject.GetComponent<SpriteRenderer>().sortingLayerName = "GroundStuff";
         gameObject.GetComponent<SpriteRenderer>().sprite = deadSprite;
         foreach (BoxCollider2D boxCollider2D in gameObject.GetComponentsInChildren<BoxCollider2D>())
         {

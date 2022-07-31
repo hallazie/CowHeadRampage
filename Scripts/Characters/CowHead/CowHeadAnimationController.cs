@@ -7,6 +7,7 @@ static class CowHeadAnimationStates
 {
     public const string Idle = "CH_Idle";
     public const string Run = "CH_Walk";
+    public const string Sprint = "CH_Sprint";
     public const string AttackWalk = "CH_Attack_Walk";
     public const string Die = "CH_Die";
 
@@ -15,15 +16,11 @@ static class CowHeadAnimationStates
 }
 
 
-public class CowHeadAnimationController
+public class CowHeadAnimationController: PawnAnimationController
 {
 
     public CowHeadController controller;
     public Animator upperBodyAnimator;
-
-    private string currentAnimationName;
-    private string previousAnimationName;
-    private bool isPlaying;
 
     public CowHeadAnimationController(CowHeadController controller, Animator upperBodyAnimator)
     {
@@ -49,7 +46,14 @@ public class CowHeadAnimationController
         }
         if (controller.states.moveSpeed > 0)
         {
-            PlayAnimation(CowHeadAnimationStates.Run);
+            if (controller.states.sprint)
+            {
+                PlayAnimation(CowHeadAnimationStates.Sprint);
+            }
+            else
+            {
+                PlayAnimation(CowHeadAnimationStates.Run);
+            }
         }
         else
         {
@@ -57,14 +61,7 @@ public class CowHeadAnimationController
         }
     }
 
-    public void StopAnimation()
-    {
-        isPlaying = false;
-        previousAnimationName = currentAnimationName;
-        currentAnimationName = null;
-    }
-
-    public void PlayAnimation(string animationName, bool overwrite = false)
+    public override void PlayAnimation(string animationName, bool overwrite = false)
     {
         if ((currentAnimationName == CowHeadAnimationStates.Run || currentAnimationName == CowHeadAnimationStates.Idle) && (animationName != CowHeadAnimationStates.Run && animationName != CowHeadAnimationStates.Idle))
         {

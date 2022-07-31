@@ -30,7 +30,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3459735840180077390}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.28, y: -0.6, z: -0.98589236}
+  m_LocalPosition: {x: -0.018, y: -0.021, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 3459735840184223318}
@@ -54,8 +54,10 @@ MonoBehaviour:
   weapon: {fileID: 2151512672803709662}
   deadSprite: {fileID: 21300000, guid: 6510b2c431246564caa4ba7bea63d441, type: 3}
   rgdbody: {fileID: 3459735840180077377}
+  boxCollider: {fileID: 0}
   characterType: CowHead
-  runSpeed: 10
+  runSpeed: 5
+  sprintMultiplier: 2
   attackDamage: 10
   attackGap: 0.5
   maxHealth: 30
@@ -98,7 +100,7 @@ SpriteRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: -1869315837
-  m_SortingLayer: 5
+  m_SortingLayer: 6
   m_SortingOrder: 0
   m_Sprite: {fileID: 21300000, guid: 9087a01f42a9b364787d0acf14ff6f9c, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -124,18 +126,18 @@ BoxCollider2D:
   m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: -0.024315715, y: -0.19710761}
+  m_Offset: {x: 0.013584137, y: 0.03955376}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
-    pivot: {x: 0.5, y: 0.5}
-    oldSize: {x: 1.5, y: 1.5}
+    pivot: {x: 0.47172323, y: 0.32618093}
+    oldSize: {x: 1, y: 1}
     newSize: {x: 1.5, y: 1.5}
     adaptiveTilingThreshold: 0.5
     drawMode: 0
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 1.0791678, y: 0.5003208}
+  m_Size: {x: 0.59348416, y: 0.27309895}
   m_EdgeRadius: 0
 --- !u!50 &3459735840180077377
 Rigidbody2D:
@@ -204,7 +206,7 @@ MonoBehaviour:
   - {x: -0.55188406, y: -0.10249913, z: 0}
   m_ShapePathHash: 1002558475
   m_Mesh: {fileID: 0}
-  m_InstanceId: -114910
+  m_InstanceId: 34028
 --- !u!1 &3459735840184223319
 GameObject:
   m_ObjectHideFlags: 0
@@ -217,7 +219,7 @@ GameObject:
   - component: {fileID: 3527162509079830252}
   m_Layer: 8
   m_Name: Aimer
-  m_TagString: Untagged
+  m_TagString: Effect
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -262,7 +264,7 @@ GameObject:
   - component: {fileID: 4910026689713036761}
   m_Layer: 8
   m_Name: DamageCollider
-  m_TagString: Untagged
+  m_TagString: Weapon
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -274,13 +276,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3459735841430631536}
-  m_LocalRotation: {x: 0, y: 0, z: 0.73439723, w: 0.6787199}
-  m_LocalPosition: {x: -0.0187, y: -0.2369, z: 0}
-  m_LocalScale: {x: 4.141591, y: 0.63710994, z: 1}
+  m_LocalRotation: {x: -0, y: -0, z: 0.99998504, w: 0.0054741963}
+  m_LocalPosition: {x: 0.0054, y: 0.0161, z: 0}
+  m_LocalScale: {x: 2.6274095, y: 0.2940931, z: 1}
   m_Children: []
   m_Father: {fileID: 3459735840180077378}
   m_RootOrder: 1
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 94.513}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 179.373}
 --- !u!61 &3459735841430631538
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -291,10 +293,10 @@ BoxCollider2D:
   m_Enabled: 1
   m_Density: 1
   m_Material: {fileID: 0}
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: 0.0038253707, y: 0.0062794983}
+  m_Offset: {x: 0.0017197831, y: 0.069357544}
   m_SpriteTilingProperty:
     border: {x: 0.049999997, y: 0.049999997, z: 0.049999997, w: 0.049999997}
     pivot: {x: 0.5, y: 0.5}
@@ -305,7 +307,7 @@ BoxCollider2D:
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 0.03863257, y: 0.24479002}
+  m_Size: {x: 0.042904444, y: 0.2821164}
   m_EdgeRadius: 0
 --- !u!114 &2151512672803709662
 MonoBehaviour:

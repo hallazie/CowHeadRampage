@@ -15,7 +15,7 @@ public class Bullet : MonoBehaviour
     public Vector3 targetPosition;
 
     private Vector3 direction = Vector3.zero;
-    private bool enabled = true;
+    private bool alive = true;
 
     public void Init(MessageInstantiateBullet message)
     {
@@ -34,7 +34,7 @@ public class Bullet : MonoBehaviour
 
     void Update()
     {
-        if (!enabled)
+        if (!alive)
             return;
         Vector3 delta = direction * flyingSpeed;
         transform.position += delta;
@@ -44,12 +44,12 @@ public class Bullet : MonoBehaviour
     {
         GetComponent<SpriteRenderer>().sprite = null;
         GetComponent<BoxCollider2D>().enabled = false;
-        enabled = false;
+        alive = false;
     }
 
     private void OnTriggerEnter2D(Collider2D collider)
     {
-        if (!enabled)
+        if (!alive)
             return;
         if (collider.gameObject.layer == GameManager.instance.layerDict["Enemy"])
         {
@@ -60,10 +60,16 @@ public class Bullet : MonoBehaviour
             FloatingTextManager.instance.ShowBasic("-" + damageAmount.ToString(), Color.yellow, gameObject.transform.position, Vector3.up * 64, duration: 2f, fontSize: 32);
             collider.gameObject.SendMessage("ReceiveDamage", new MessageReceiveDamage((int)damageAmount));
         }
+        if (collider.transform.parent != null && collider.transform.parent.tag == targetTag)
+        {
+            FloatingTextManager.instance.ShowBasic("-" + damageAmount.ToString(), Color.yellow, gameObject.transform.position, Vector3.up * 64, duration: 2f, fontSize: 32);
+            collider.transform.parent.gameObject.SendMessage("ReceiveDamage", new MessageReceiveDamage((int)damageAmount));
+        }
         GameManager.instance.effectDisplayController.PlayBlastEffect(transform.position);
         if (collider.name == "DamageCollider" && collider.gameObject.transform.parent.name == "CowHead")
         {
             HideBullet();
+            Destroy(gameObject, 3f);
             return;
         }
         Destroy(gameObject);
@@ -71,7 +77,8 @@ public class Bullet : MonoBehaviour
 
     public void ReceiveDamage(MessageReceiveDamage message)
     {
-        for(int i = 0; i < 3; i++)
+        GameManager.instance.ShakeCamera();
+        for (int i = 0; i < 3; i++)
         {
             float jitx = Random.Range(-3, 3);
             float jity = Random.Range(-3, 3);

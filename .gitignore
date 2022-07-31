@@ -1,5 +1,7 @@
 Scripts/Third/
+*.asset
 *.meta
 *.mp3
 *.wav
 *.png
+*.unity

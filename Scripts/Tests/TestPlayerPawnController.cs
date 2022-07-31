@@ -70,4 +70,9 @@ public class TestPlayerPawnController : AttackablePawn
     {
         
     }
+
+    public override void DamagedEffect(MessageAttackEffect message)
+    {
+
+    }
 }

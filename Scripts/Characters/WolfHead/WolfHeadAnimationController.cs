@@ -13,15 +13,11 @@ static class WolfHeadAnimationStates
     public const string Shoot = "WH_Shoot";
 }
 
-public class WolfHeadAnimationController
+public class WolfHeadAnimationController: PawnAnimationController
 {
 
     public WolfHeadController controller;
     public Animator upperBodyAnimator;
-
-    private string currentAnimationName;
-    private string previousAnimationName;
-    private bool isPlaying;
 
     public WolfHeadAnimationController(WolfHeadController controller, Animator upperBodyAnimator)
     {
@@ -87,14 +83,7 @@ public class WolfHeadAnimationController
         }
     }
 
-    public void StopAnimation()
-    {
-        isPlaying = false;
-        previousAnimationName = currentAnimationName;
-        currentAnimationName = null;
-    }
-
-    public void PlayAnimation(string animationName, bool overwrite = false)
+    public override void PlayAnimation(string animationName, bool overwrite = false)
     {
         // Debug.Log("playing: " + animationName + ", current: " + currentAnimationName + ", previous: " + previousAnimationName);
         if ((currentAnimationName == WolfHeadAnimationStates.Run || currentAnimationName == WolfHeadAnimationStates.Idle) && (animationName != WolfHeadAnimationStates.Run && animationName != WolfHeadAnimationStates.Idle))
