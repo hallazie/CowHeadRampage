@@ -9,11 +9,11 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 199002563697095668}
+  - component: {fileID: 466910746}
   - component: {fileID: 199002563697095669}
   - component: {fileID: 199002563697095667}
   - component: {fileID: 466910748}
   - component: {fileID: 466910750}
-  - component: {fileID: 466910746}
   m_Layer: 9
   m_Name: PigHead
   m_TagString: Enemy
@@ -35,6 +35,21 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &466910746
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 199002563697095670}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cf1a8b21501931348b5060728da215cf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  rgdbody: {fileID: 0}
+  animator: {fileID: 199002563697095669}
+  deadSprite: {fileID: 21300000, guid: e2a2b15a444b5314e96a593502079ee1, type: 3}
 --- !u!95 &199002563697095669
 Animator:
   serializedVersion: 3
@@ -92,7 +107,7 @@ SpriteRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: -44025399
-  m_SortingLayer: 4
+  m_SortingLayer: 5
   m_SortingOrder: 0
   m_Sprite: {fileID: 21300000, guid: cf9cc057af730624bbf72c3e0c2952dc, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -152,17 +167,3 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 0.55814165, y: 0.5236139}
   m_EdgeRadius: 0
---- !u!114 &466910746
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 199002563697095670}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: cf1a8b21501931348b5060728da215cf, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  rgdbody: {fileID: 0}
-  animator: {fileID: 199002563697095669}

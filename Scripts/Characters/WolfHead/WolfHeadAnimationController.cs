@@ -29,14 +29,14 @@ public class WolfHeadAnimationController: PawnAnimationController
     {
         if (!controller.states.alive)
         {
-            PlayAnimation(WolfHeadAnimationStates.Die, true);
+            // PlayAnimation(WolfHeadAnimationStates.Die, true);
             return;
         }
         if (!GameManager.instance.cowHead.states.alive)
         {
             PlayAnimation(WolfHeadAnimationStates.Idle);
         }
-        if (controller.states.playerVisible && controller.states.hostilityLevel == 3)
+        if (controller.states.hostilityLevel == 3)
         {
             // wolfhead进入攻击模式
             if (controller.states.allowAim)
@@ -52,11 +52,11 @@ public class WolfHeadAnimationController: PawnAnimationController
             }
             else
             {
-                if (controller.states.distance.magnitude > controller.sprintRange)
+                if (controller.states.distance.magnitude > controller.sprintRange && !controller.states.lostTrack)
                 {
                     PlayAnimation(WolfHeadAnimationStates.Sprint);
                 }
-                else if (controller.states.distance.magnitude >= controller.fistAttackRange && controller.states.distance.magnitude < controller.sprintRange)
+                else if (controller.states.distance.magnitude >= controller.fistAttackRange && controller.states.distance.magnitude < controller.sprintRange && !controller.states.lostTrack)
                 {
                     PlayAnimation(WolfHeadAnimationStates.Run);
                 }
@@ -68,18 +68,18 @@ public class WolfHeadAnimationController: PawnAnimationController
                     }
                     else
                     {
-                        PlayAnimation(WolfHeadAnimationStates.Idle);
+                        PlayAnimation(WolfHeadAnimationStates.Idle, true);
                     }
                 }
                 else
                 {
-                    PlayAnimation(WolfHeadAnimationStates.Idle);
+                    PlayAnimation(WolfHeadAnimationStates.Idle, true);
                 }
             }
         }
         else
         {
-            PlayAnimation(WolfHeadAnimationStates.Idle);
+            PlayAnimation(WolfHeadAnimationStates.Idle, true);
         }
     }
 

@@ -15,15 +15,18 @@ public class BGMManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        float audioLength = audioSource.clip.length;
-        float startPoint = Random.Range(0, audioLength);
-        audioSource.time = startPoint;
+        // float audioLength = audioSource.clip.length;
+        // float startPoint = Random.Range(0, audioLength);
+        // audioSource.time = startPoint;
         audioSource.Play();
     }
 
     // Update is called once per frame
     void Update()
     {
-        
+        if(Mathf.Abs(audioSource.time - audioSource.clip.length) <= 0.05f)
+        {
+            audioSource.Play();
+        }
     }
 }

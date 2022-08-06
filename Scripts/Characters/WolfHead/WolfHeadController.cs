@@ -6,14 +6,19 @@ public class WolfHeadState
 {
     public float health = 0f;
     public float moveSpeed = 0f;
+
     public Vector3 distance = Vector3.zero;
     public Vector3 target = Vector3.zero;
+
+    public int hostilityLevel = 1;                   // 0: friend, 1: neutral, 2: hostile, 3: enemy
+
+    public bool alive = true;
     public bool playerVisible = false;
     public bool allowAttack = false;
-    public bool alive = true;
-    public int hostilityLevel = 1;                   // 0: friend, 1: neutral, 2: hostile, 3: enemy
     public bool allowAim = false;                    // 是否开始进入瞄准姿态
     public bool allowShoot = false;                  // 是否可进行射击
+    public bool lostTrack = false;
+
     public string attackMode = "None";
 }
 
@@ -27,6 +32,7 @@ public class WolfHeadController : AttackablePawn
     public Animator animator;
     public MeleeWeapon weapon;
     public Sprite deadSprite;
+    public List<Sprite> deadSpriteList;
     public WolfHeadAnimationController animationController;
     public WolfHeadState states;
     public Rigidbody2D rgdbody;
@@ -52,6 +58,10 @@ public class WolfHeadController : AttackablePawn
     public float attackGap = 0.8f;
 
     private Vector3 originalPosition;
+    private Queue<Vector3> hostileNavQueue = null;
+    private List<Vector3> hostileNavList = null;
+    private Queue<Vector3> patrolNavQueue = null;
+    private Vector3 nextNavPosition;
     private float nextAttackTime = 0f;
     private float lastSawPlayerTime = 0f;
     private float lastShootTime = 0f;
@@ -69,7 +79,6 @@ public class WolfHeadController : AttackablePawn
         interactionManager = GameObject.Find("InteractionManager");
 
         rgdbody = GetComponent<Rigidbody2D>();
-        
 
         animationController = new WolfHeadAnimationController(this, animator);
         states = new WolfHeadState();
@@ -95,6 +104,8 @@ public class WolfHeadController : AttackablePawn
 
     private void UpdateStates()
     {
+        states.hostilityLevel = 3;
+
         states.playerVisible = IsPlayerVisible();
         if (!states.playerVisible)
         {
@@ -142,23 +153,78 @@ public class WolfHeadController : AttackablePawn
     {
         if (states.hostilityLevel == 3)
         {
+
+            if (states.playerVisible)
+            {
+                // TODO 判断destination是否改变，若改变再重新进行ASTAR算法，减少消耗。
+                hostileNavQueue = GameManager.instance.navGridManager.FindVertexQueue(transform.position, cowHead.transform.position);
+                //if (hostileNavQueue != null)
+                //{
+                //    hostileNavList = new List<Vector3>();
+                //    while (hostileNavQueue.Count > 0)
+                //    {
+                //        hostileNavList.Add(hostileNavQueue.Dequeue());
+                //    }
+                //    hostileNavQueue.Clear();
+                //    foreach (Vector3 pos in hostileNavList)
+                //    {
+                //        hostileNavQueue.Enqueue(pos);
+                //    }
+                //}
+            }
+
             // 敌对模式
-            if (states.allowAim)
+            if (states.allowAim && states.playerVisible)
             {
                 transform.up = states.target.normalized;
             }
-            else if (states.playerVisible && states.distance.magnitude < visionRange && states.distance.magnitude > fistAttackRange)
+            else if (states.distance.magnitude < visionRange && states.distance.magnitude > fistAttackRange)
             {
                 // can see player, go chase
                 if (states.distance.magnitude > sprintRange)
                 {
                     states.target *= sprintFactor;
                 }
-                transform.up = states.target.normalized;
-                transform.position += states.target;
+
+                // movement
+                if (hostileNavQueue != null)
+                {
+                    Vector2 navMovePosition = (Vector2)(transform.position - nextNavPosition);
+                    if (nextNavPosition == Vector3.zero || navMovePosition.magnitude <= 0.01f && hostileNavQueue != null && hostileNavQueue.Count > 0)
+                    {
+                        nextNavPosition = hostileNavQueue.Dequeue();
+                    }
+                    else if (navMovePosition.magnitude <= 0.01f && hostileNavQueue != null && hostileNavQueue.Count == 0)
+                    {
+                        states.lostTrack = true;
+                        states.moveSpeed = 0f;
+                    }
+                    else
+                    {
+                        states.lostTrack = false;
+                        Vector2 heading = -1 * navMovePosition.normalized;
+                        Vector3 target = new Vector3(heading.x * runSpeed * Time.deltaTime, heading.y * runSpeed * Time.deltaTime, 0);
+                        if (navMovePosition.magnitude > 0.001f)
+                        {
+                            // print("heading: " + heading + ", target: " + target + " with mag: " + target.magnitude + " and sqr mag: " + target.sqrMagnitude);
+                            transform.up = target.normalized;
+                            transform.position += target;
+                            states.moveSpeed = target.magnitude;
+                        }
+                        else
+                        {
+                            states.moveSpeed = 0f;
+                        }
+                    }
+                }
+
+                //// no use nav
+                //transform.up = states.target.normalized;
+                //transform.position += states.target;
             }
             else if (states.distance.magnitude <= fistAttackRange)
             {
+                hostileNavQueue = null;
                 // can attack palyer
                 if (Time.time > nextAttackTime)
                 {
@@ -170,6 +236,10 @@ public class WolfHeadController : AttackablePawn
                 {
                     states.allowAttack = false;
                 }
+            }
+            else
+            {
+                hostileNavQueue = null;
             }
         }
         else if (states.hostilityLevel == 1)
@@ -288,6 +358,25 @@ public class WolfHeadController : AttackablePawn
            Gizmos.DrawLine(transform.position, cowHead.transform.position);
         Gizmos.DrawWireSphere(transform.position, gizmosRange);
 
+        //if (hostileNavList != null)
+        //{
+        //    // print("draw nav gizmos with queue size: " + hostileNavList.Count);
+        //    Vector3 prevGizmosNav = Vector3.zero;
+        //    for (int i = 0; i < hostileNavList.Count; i++)
+        //    {
+        //        Vector3 nextGizmosNav = hostileNavList[i];
+        //        if (prevGizmosNav == Vector3.zero)
+        //        {
+        //            prevGizmosNav = nextGizmosNav;
+        //            continue;
+        //        }
+        //        else
+        //        {
+        //            Gizmos.DrawLine((Vector2)prevGizmosNav, (Vector2)nextGizmosNav);
+        //        }
+        //        prevGizmosNav = nextGizmosNav;
+        //    }
+        //}
     }
 
     public void StopAnimation()
@@ -360,8 +449,9 @@ public class WolfHeadController : AttackablePawn
         if (states.health <= 0)
         {
             states.health = 0;
-            animationController.PlayAnimation(WolfHeadAnimationStates.Die, overwrite: true);
+            // animationController.PlayAnimation(WolfHeadAnimationStates.Die, overwrite: true);
             states.alive = false;
+            Dead();
         }
     }
 
@@ -385,11 +475,34 @@ public class WolfHeadController : AttackablePawn
     public override void Dead()
     {
         animator.enabled = false;
-        gameObject.GetComponent<SpriteRenderer>().sprite = deadSprite;
+        int deadSpriteIndex = Random.Range(0, deadSpriteList.Count);
+        switch (deadSpriteIndex)
+        {
+            case 0:
+                break;
+            case 1:
+                transform.up = states.target.normalized * -1;
+                break;
+        }
+        // rgdbody.AddForce((transform.position - cowHead.transform.position).normalized * 5f);
+        // StartCoroutine(SlideOnDirection(transform.position - cowHead.transform.position, 5f));
+        gameObject.GetComponent<SpriteRenderer>().sprite = deadSpriteList[deadSpriteIndex];
         gameObject.GetComponent<SpriteRenderer>().sortingLayerName = "GroundStuff";
         foreach (BoxCollider2D boxCollider2D in gameObject.GetComponentsInChildren<BoxCollider2D>())
         {
             boxCollider2D.enabled = false;
         }
+    }
+
+    public IEnumerator SlideOnDirection(Vector3 direction, float distance)
+    {
+        Vector3 destination = direction * distance;
+        while ((destination - transform.position).magnitude < 0.001f)
+        {
+            // transform.position += Vector3.Lerp(transform.position, destination, 0.1f);
+            transform.position += direction * 0.1f;
+            yield return null;
+        }
+
     }
 }

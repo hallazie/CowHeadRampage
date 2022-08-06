@@ -4,11 +4,11 @@ using UnityEngine;
 
 public class GameManager : MonoBehaviour
 {
-
     public CowHeadController cowHead;
-
     public EffectDisplayController effectDisplayController;
     public CameraShake cameraShaker;
+    public SystemManager systemManager;
+    public NavGridManager navGridManager;
 
 
     // Singleton Pattern
@@ -31,10 +31,10 @@ public class GameManager : MonoBehaviour
         {
             _instance = this;
         }
+        systemManager = new SystemManager();
+}
 
-    }
-
-    public bool playerAlive = true;
+public bool playerAlive = true;
 
     public Dictionary<string, int> layerDict = new Dictionary<string, int>{
         {"Player", 8 },
@@ -45,10 +45,15 @@ public class GameManager : MonoBehaviour
     void Start()
     {
         // Cursor.visible = false;
+        Physics2D.IgnoreLayerCollision(layerDict["Enemy"], layerDict["Enemy"]);
     }
 
     void Update()
     {
+        if (cowHead == null)
+        {
+            return;
+        }
         if (Input.GetKeyDown(KeyCode.R) && !cowHead.states.alive) {
             playerAlive = true;
             cowHead.Respawn();
@@ -67,12 +72,16 @@ public class GameManager : MonoBehaviour
         StartCoroutine(cameraShaker.Shake(duration, magnitude, frameGap));
     }
 
-    public void BroadcastEnemyHostility()
+    public void BroadcastEnemyHostility(float range = 10f, bool requiredVisible = false)
     {
         WolfHeadController[] wolfHeadList = FindObjectsOfType<WolfHeadController>();
         foreach (WolfHeadController wolfHead in wolfHeadList)
         {
             if (wolfHead.states.playerVisible)
+            {
+                wolfHead.states.hostilityLevel = 3;
+            }
+            if (!requiredVisible && (wolfHead.transform.position - cowHead.transform.position).magnitude <= range)
             {
                 wolfHead.states.hostilityLevel = 3;
             }

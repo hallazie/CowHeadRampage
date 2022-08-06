@@ -23,7 +23,15 @@ public class PigHeadAnimationController : PawnAnimationController
 
     public void UpdateAnimationParameter()
     {
-        PlayAnimation(PigHeadAnimationStates.Idle);
+        if (!controller.states.alive)
+        {
+            PlayAnimation(PigHeadAnimationStates.Die);
+            return;
+        }
+        else
+        {
+            PlayAnimation(PigHeadAnimationStates.Idle);
+        }
     }
 
     public override void PlayAnimation(string animationName, bool overwrite = false)

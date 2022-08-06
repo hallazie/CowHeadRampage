@@ -96,7 +96,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 835ad4a986dd7204a8a1eb7e853c98af, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  flyingSpeed: 0.025
+  flyingSpeed: 0.1
   damageAmount: 5
   sourceTag: 
   targetTag: 

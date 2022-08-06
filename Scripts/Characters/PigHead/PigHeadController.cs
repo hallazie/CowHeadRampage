@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class PigHeadState
 {
-    public float health = 0f;
+    public float health = 20f;
     public float moveSpeed = 0f;
     public Vector3 distance = Vector3.zero;
     public Vector3 target = Vector3.zero;
@@ -19,6 +19,7 @@ public class PigHeadController : AttackablePawn
 
     public Rigidbody2D rgdbody;
     public Animator animator;
+    public Sprite deadSprite;
 
     public PigHeadState states;
     public PigHeadAnimationController animationController;
@@ -63,6 +64,11 @@ public class PigHeadController : AttackablePawn
         }
     }
 
+    public void Respawn()
+    {
+
+    }
+
     public void StopAnimation()
     {
 
@@ -94,12 +100,26 @@ public class PigHeadController : AttackablePawn
 
     public override void Dead()
     {
-        
+        animator.enabled = false;
+        gameObject.GetComponent<SpriteRenderer>().sprite = deadSprite;
+        gameObject.GetComponent<SpriteRenderer>().sortingLayerName = "GroundStuff";
+        foreach (BoxCollider2D boxCollider2D in gameObject.GetComponentsInChildren<BoxCollider2D>())
+        {
+            boxCollider2D.enabled = false;
+        }
     }
 
     public override void ReceiveDamage(MessageReceiveDamage message)
     {
-        
+        GameManager.instance.BroadcastEnemyHostility();
+
+        states.health -= message.damageAmount;
+        if (states.health <= 0)
+        {
+            states.health = 0;
+            animationController.PlayAnimation(PigHeadAnimationStates.Die, overwrite: true);
+            states.alive = false;
+        }
     }
 
     public override void StartAttack()

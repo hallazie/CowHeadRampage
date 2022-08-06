@@ -75,9 +75,12 @@ MonoBehaviour:
   animator: {fileID: 1485445418320543929}
   weapon: {fileID: 7197047881220640872}
   deadSprite: {fileID: 21300000, guid: e2a2b15a444b5314e96a593502079ee1, type: 3}
+  deadSpriteList:
+  - {fileID: 21300000, guid: e2a2b15a444b5314e96a593502079ee1, type: 3}
+  - {fileID: 21300000, guid: 7e6dabc5bcb88604487180ddf1e2addf, type: 3}
   rgdbody: {fileID: 0}
   characterType: WolfHead
-  runSpeed: 2
+  runSpeed: 3
   sprintFactor: 2
   visionRange: 10
   sprintRange: 6
@@ -91,7 +94,7 @@ MonoBehaviour:
   aimingMaxTime: 1
   attackDamage: 10
   pistolDamage: 5
-  maxHealth: 30
+  maxHealth: 10
   attackGap: 0.3
   fistDamageColor: {r: 1, g: 0, b: 0, a: 1}
 --- !u!212 &1485445418320543927
@@ -158,7 +161,7 @@ BoxCollider2D:
   m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: -0.052787066, y: -0.120048404}
+  m_Offset: {x: -0.058645487, y: -0.13176513}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
@@ -169,7 +172,7 @@ BoxCollider2D:
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 0.6082599, y: 0.35235262}
+  m_Size: {x: 0.287647, y: 0.2586186}
   m_EdgeRadius: 0
 --- !u!50 &1485445418320543925
 Rigidbody2D:
@@ -219,7 +222,7 @@ MonoBehaviour:
   - {x: -0.5203928, y: 0.0249241, z: 0}
   m_ShapePathHash: 1472703593
   m_Mesh: {fileID: 0}
-  m_InstanceId: 47498
+  m_InstanceId: -1294
 --- !u!1 &1698532945638168398
 GameObject:
   m_ObjectHideFlags: 0

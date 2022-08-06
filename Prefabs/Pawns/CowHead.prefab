@@ -56,11 +56,11 @@ MonoBehaviour:
   rgdbody: {fileID: 3459735840180077377}
   boxCollider: {fileID: 0}
   characterType: CowHead
-  runSpeed: 5
+  runSpeed: 4
   sprintMultiplier: 2
   attackDamage: 10
   attackGap: 0.5
-  maxHealth: 30
+  maxHealth: 10
   knifeDamageColor: {r: 0, g: 0, b: 1, a: 1}
 --- !u!212 &3459735840180077379
 SpriteRenderer:
@@ -158,7 +158,7 @@ Rigidbody2D:
   m_Material: {fileID: 0}
   m_Interpolate: 0
   m_SleepingMode: 1
-  m_CollisionDetection: 0
+  m_CollisionDetection: 1
   m_Constraints: 0
 --- !u!95 &2012358721
 Animator:
@@ -206,7 +206,7 @@ MonoBehaviour:
   - {x: -0.55188406, y: -0.10249913, z: 0}
   m_ShapePathHash: 1002558475
   m_Mesh: {fileID: 0}
-  m_InstanceId: 34028
+  m_InstanceId: -1468
 --- !u!1 &3459735840184223319
 GameObject:
   m_ObjectHideFlags: 0

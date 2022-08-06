@@ -74,12 +74,6 @@ public class CowHeadController : AttackablePawn
             return;
         UpdateStates();
         animationController.UpdateAnimationParameter();
-    }
-
-    private void FixedUpdate()
-    {
-        if (!states.alive || states.occupied)
-            return;
         UpdateMovement();
         if (states.attack)
         {
@@ -87,10 +81,14 @@ public class CowHeadController : AttackablePawn
         }
     }
 
+    private void FixedUpdate()
+    {
+
+    }
+
     private void UpdateStates()
     {
-        states.sprint = Input.GetKey(KeyCode.LeftShift);
-        states.horizontalSpeed = Input.GetAxisRaw("Horizontal");
+        states.horizontalSpeed = Input.GetAxisRaw("Horizontal");    
         states.verticalSpeed = Input.GetAxisRaw("Vertical");
         states.moveSpeed = Mathf.Sqrt(states.horizontalSpeed * states.horizontalSpeed + states.verticalSpeed * states.verticalSpeed);
         states.attack = Input.GetMouseButton(0) || Input.GetMouseButtonDown(0) || states.attack;
@@ -114,11 +112,13 @@ public class CowHeadController : AttackablePawn
             return;
         if (!states.sprint)
         {
-            transform.position += new Vector3(states.horizontalSpeed * Time.deltaTime * runSpeed, states.verticalSpeed * Time.deltaTime * runSpeed, 0);
+            // Vector3 nextPosition = new Vector3(transform.position.x + states.horizontalSpeed * Time.deltaTime * runSpeed, transform.position.y + states.verticalSpeed * Time.deltaTime * runSpeed, 0);
+            // transform.position = Vector3.Lerp(transform.position, nextPosition, Time.deltaTime * runSpeed);
+            gameObject.transform.position += new Vector3(states.horizontalSpeed * Time.deltaTime * runSpeed, states.verticalSpeed * Time.deltaTime * runSpeed, 0);
         }
         else
         {
-            transform.position += new Vector3(states.horizontalSpeed * Time.deltaTime * runSpeed * sprintMultiplier, states.verticalSpeed * Time.deltaTime * runSpeed * sprintMultiplier, 0);
+            gameObject.transform.position += new Vector3(states.horizontalSpeed * Time.deltaTime * runSpeed * sprintMultiplier, states.verticalSpeed * Time.deltaTime * runSpeed * sprintMultiplier, 0);
         }
         transform.up = states.lookAtDirection; 
 

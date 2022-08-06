@@ -131,6 +131,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 73fade7df9277a6489b7ed0e247072e2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  cowHead: {fileID: 0}
+  maxOverlookDistance: 15
+  cameraMoveSpeed: 20
 --- !u!114 &7875553808654442892
 MonoBehaviour:
   m_ObjectHideFlags: 0
