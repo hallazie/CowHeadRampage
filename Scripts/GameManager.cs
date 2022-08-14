@@ -45,7 +45,7 @@ public bool playerAlive = true;
     void Start()
     {
         // Cursor.visible = false;
-        Physics2D.IgnoreLayerCollision(layerDict["Enemy"], layerDict["Enemy"]);
+        // Physics2D.IgnoreLayerCollision(layerDict["Enemy"], layerDict["Enemy"]);
     }
 
     void Update()
@@ -72,18 +72,18 @@ public bool playerAlive = true;
         StartCoroutine(cameraShaker.Shake(duration, magnitude, frameGap));
     }
 
-    public void BroadcastEnemyHostility(float range = 10f, bool requiredVisible = false)
+    public void BroadcastEnemyHostility(int hostilityLevel = 3, float range = 10f, bool requiredVisible = false)
     {
         WolfHeadController[] wolfHeadList = FindObjectsOfType<WolfHeadController>();
         foreach (WolfHeadController wolfHead in wolfHeadList)
         {
             if (wolfHead.states.playerVisible)
             {
-                wolfHead.states.hostilityLevel = 3;
+                wolfHead.states.hostilityLevel = hostilityLevel;
             }
             if (!requiredVisible && (wolfHead.transform.position - cowHead.transform.position).magnitude <= range)
             {
-                wolfHead.states.hostilityLevel = 3;
+                wolfHead.states.hostilityLevel = hostilityLevel;
             }
         }
     }

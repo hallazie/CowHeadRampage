@@ -57,12 +57,12 @@ public class Bullet : MonoBehaviour
         }
         if (collider.gameObject.tag == targetTag)
         {
-            FloatingTextManager.instance.ShowBasic("-" + damageAmount.ToString(), Color.yellow, gameObject.transform.position, Vector3.up * 64, duration: 2f, fontSize: 32);
+            // FloatingTextManager.instance.ShowBasic("-" + damageAmount.ToString(), Color.yellow, gameObject.transform.position, Vector3.up * 64, duration: 2f, fontSize: 32);
             collider.gameObject.SendMessage("ReceiveDamage", new MessageReceiveDamage((int)damageAmount));
         }
         if (collider.transform.parent != null && collider.transform.parent.tag == targetTag)
         {
-            FloatingTextManager.instance.ShowBasic("-" + damageAmount.ToString(), Color.yellow, gameObject.transform.position, Vector3.up * 64, duration: 2f, fontSize: 32);
+            // FloatingTextManager.instance.ShowBasic("-" + damageAmount.ToString(), Color.yellow, gameObject.transform.position, Vector3.up * 64, duration: 2f, fontSize: 32);
             collider.transform.parent.gameObject.SendMessage("ReceiveDamage", new MessageReceiveDamage((int)damageAmount));
         }
         GameManager.instance.effectDisplayController.PlayBlastEffect(transform.position);

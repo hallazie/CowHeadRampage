@@ -85,17 +85,19 @@ MonoBehaviour:
   visionRange: 10
   sprintRange: 6
   fistAttackRange: 0.5
+  minContactRange: 0.25
   drawGizmos: 0
   interactRange: 1
   gizmosRange: 2
   hostileDuration: 5
   shootProbability: 0.3
+  maxShootRange: 3
   aimingMinTime: 0.5
   aimingMaxTime: 1
   attackDamage: 10
   pistolDamage: 5
   maxHealth: 10
-  attackGap: 0.3
+  attackGap: 0.5
   fistDamageColor: {r: 1, g: 0, b: 0, a: 1}
 --- !u!212 &1485445418320543927
 SpriteRenderer:
@@ -222,7 +224,7 @@ MonoBehaviour:
   - {x: -0.5203928, y: 0.0249241, z: 0}
   m_ShapePathHash: 1472703593
   m_Mesh: {fileID: 0}
-  m_InstanceId: -1294
+  m_InstanceId: 50356
 --- !u!1 &1698532945638168398
 GameObject:
   m_ObjectHideFlags: 0
@@ -295,10 +297,10 @@ BoxCollider2D:
   m_Enabled: 1
   m_Density: 1
   m_Material: {fileID: 0}
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: -0.0037519038, y: 0.04037197}
+  m_Offset: {x: -0.043611377, y: -0.10534404}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
@@ -309,7 +311,7 @@ BoxCollider2D:
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 0.21493763, y: 0.24065885}
+  m_Size: {x: 0.25806433, y: 0.18184969}
   m_EdgeRadius: 0
 --- !u!212 &3160734863151366833
 SpriteRenderer:

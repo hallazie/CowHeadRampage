@@ -43,14 +43,16 @@ public class WolfHeadController : AttackablePawn
     public float visionRange = 16f;
     public float sprintRange = 8f;
     public float fistAttackRange = 0.5f;
+    public float minContactRange = 0.1f;
     public bool drawGizmos = false;
     public float interactRange = 1f;
     public float gizmosRange = 1f;
     public float hostileDuration = 5f;
 
     public float shootProbability = 0.5f;
+    public float maxShootRange = 3f;
     public float aimingMinTime = 0.5f;
-    public float aimingMaxTime = 2f;
+    public float aimingMaxTime = 1f;
 
     public int attackDamage = 10;
     public float pistolDamage = 5f;
@@ -59,7 +61,6 @@ public class WolfHeadController : AttackablePawn
 
     private Vector3 originalPosition;
     private Queue<Vector3> hostileNavQueue = null;
-    private List<Vector3> hostileNavList = null;
     private Queue<Vector3> patrolNavQueue = null;
     private Vector3 nextNavPosition;
     private float nextAttackTime = 0f;
@@ -104,7 +105,7 @@ public class WolfHeadController : AttackablePawn
 
     private void UpdateStates()
     {
-        states.hostilityLevel = 3;
+        // states.hostilityLevel = 3;
 
         states.playerVisible = IsPlayerVisible();
         if (!states.playerVisible)
@@ -125,7 +126,7 @@ public class WolfHeadController : AttackablePawn
             float shootProb = Random.Range(0f, 1f);
             if (states.hostilityLevel > 1 && states.attackMode == "None")
             {
-                if (shootProb <= shootProbability)
+                if (shootProb <= shootProbability && states.distance.magnitude <= maxShootRange)
                 {
                     states.allowAim = true;
                     states.attackMode = "Shoot";
@@ -235,6 +236,11 @@ public class WolfHeadController : AttackablePawn
                 else
                 {
                     states.allowAttack = false;
+                }
+                if (states.distance.magnitude > minContactRange)
+                {
+                    transform.up = states.target.normalized;
+                    transform.position += states.target;
                 }
             }
             else
@@ -444,6 +450,7 @@ public class WolfHeadController : AttackablePawn
     public override void ReceiveDamage(MessageReceiveDamage message)
     {
         GameManager.instance.BroadcastEnemyHostility();
+        // FloatingTextManager.instance.ShowBasic("-" + message.damageAmount.ToString(), Color.blue, gameObject.transform.position, Vector3.up * 64, duration: 2f, fontSize: 32);
 
         states.health -= message.damageAmount;
         if (states.health <= 0)
@@ -492,6 +499,9 @@ public class WolfHeadController : AttackablePawn
         {
             boxCollider2D.enabled = false;
         }
+
+        hostileNavQueue = null;
+        nextNavPosition = Vector3.zero;
     }
 
     public IEnumerator SlideOnDirection(Vector3 direction, float distance)

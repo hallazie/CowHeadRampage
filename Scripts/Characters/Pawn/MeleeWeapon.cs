@@ -68,16 +68,8 @@ public class MeleeWeapon : MonoBehaviour
                     continue;
                 }
                 bool visible = visualConditional ? VisionUtils.CanSeeEachOther(transform.parent.gameObject, weaponHits[i].gameObject, ignoringTags) : true;
-                //if (!visible) {
-                //    enableDamage = false;
-                //    return;
-                //}
                 if (visible && weaponHits[i].tag == targetTag && !singleRoundHit.Contains(weaponHits[i].gameObject))
                 {
-                    if (showDamage)
-                    {
-                        FloatingTextManager.instance.ShowBasic("-" + attackDamage.ToString(), fontColor, gameObject.transform.position, Vector3.up * 64, duration: 2f, fontSize: 32);
-                    }
                     if (sendDamage)
                     {
                         weaponHits[i].gameObject.SendMessage("ReceiveDamage", new MessageReceiveDamage(attackDamage));

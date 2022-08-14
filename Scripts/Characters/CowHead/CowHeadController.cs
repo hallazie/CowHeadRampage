@@ -5,22 +5,28 @@ using UnityEngine;
 public class CowHeadState
 {
 
-    public bool alive;
-    public bool occupied;
-    public bool freezeMovement;
-    public bool attack;
-    public bool sprint;
+    public bool alive = true;
+    public bool occupied = false;
+    public bool freezeMovement = false;
+    public bool attack = false;
+    public bool sprint = false;
+    public bool weave = false;
+    public bool invincible = false;
+    public bool idleBoxing = false;
 
     public float horizontalSpeed;
     public float verticalSpeed;
     public float moveSpeed;
     public float health;
-    public float lastAttackTime;
+    public float lastAttackTime = 0f;
+    public float lastBoxingTime = 0f;
 
     public Vector2 lookAtDirection;
     public Vector2 movementDirection;
 
     public int comboStep;
+
+    public string weaveType = null;
 
 }
 
@@ -42,6 +48,7 @@ public class CowHeadController : AttackablePawn
     public float sprintMultiplier = 1.5f;
     public int attackDamage = 10;
     public float attackGap = 0.5f;
+    public float idleBoxingGap = 2f;
     public int maxHealth = 100;
 
     // weapon attrs
@@ -99,6 +106,29 @@ public class CowHeadController : AttackablePawn
         if (angle >= 90)
         {
             states.sprint = false;
+        }
+
+        // weave logics
+        states.weave = Input.GetKey(KeyCode.Space) || Input.GetKeyDown(KeyCode.Space) || states.weave;
+        if (states.weave && states.weaveType == null)
+        {
+            float randomIndex = Random.Range(0f, 1f);
+            if (randomIndex > 0.5f)
+            {
+                states.weaveType = "left";
+            }
+            else
+            {
+                states.weaveType = "right";
+            }
+        }
+        if (Time.time - states.lastBoxingTime <= idleBoxingGap)
+        {
+            states.idleBoxing = true;
+        }
+        else
+        {
+            states.idleBoxing = false;
         }
     }
 
@@ -160,12 +190,38 @@ public class CowHeadController : AttackablePawn
     public void FreezeMovement()
     {
         states.freezeMovement = true;
+        if (states.weave)
+        {
+            states.invincible = true;
+        }
+        else
+        {
+            states.invincible = false;
+        }
     }
 
     public void UnfreezeMovement()
     {
         states.freezeMovement = false;
+        if (states.weave)
+        {
+            states.invincible = false;
+        }
     }
+
+    public void StartWeave()
+    {
+        states.attack = false;
+    }
+
+    public void StopWeave()
+    {
+        states.weave = false;
+        states.weaveType = null;
+        states.idleBoxing = true;
+        states.lastBoxingTime = Time.time;
+    }
+
 
     // ---------------------------- OVERRIDE ATTACKABLE PAWN ----------------------------
 
@@ -174,17 +230,22 @@ public class CowHeadController : AttackablePawn
         states.attack = false;
         weapon.enableDamage = false;
         weapon.singleRoundHit.Clear();
-        if (states.comboStep == 0)
+        float randomIndex = Random.Range(0f, 1f);
+        if (randomIndex > 0.5)
         {
             states.comboStep = 1;
-        }else if (states.comboStep == 1)
+        }else
         {
             states.comboStep = 0;
         }
+        states.idleBoxing = true;
+        states.lastBoxingTime = Time.time;
     }
 
     public override void StartAttack()
     {
+        states.weave = false;
+
         states.attack = true;
         weapon.enableDamage = true;
         weapon.singleRoundHit.Clear();
@@ -194,11 +255,17 @@ public class CowHeadController : AttackablePawn
     {
         weapon.OnAttack("Enemy", ignoringTags: new List<string> { "Bullet", "Weapon", "Player", "Enemy" });
         weapon.OnAttack("Bullet", sendDamagedEffect: false, showDamage: false, visualConditional: false);
+        weapon.OnAttack("InteractableEnvironment", sendDamage: true, sendDamagedEffect: true, showDamage: false, visualConditional: false);
     }
 
     public override void ReceiveDamage(MessageReceiveDamage message)
     {
+        if (states.weave && states.invincible)
+        {
+            return;
+        }
         states.health -= message.damageAmount;
+        // FloatingTextManager.instance.ShowBasic("-" + message.damageAmount.ToString(), Color.red, gameObject.transform.position, Vector3.up * 64, duration: 2f, fontSize: 32);
         if (states.health <= 0)
         {
             states.health = 0;
@@ -216,12 +283,17 @@ public class CowHeadController : AttackablePawn
 
     public override void DamagedEffect(MessageAttackEffect message)
     {
-
+        if (states.weave && states.invincible)
+        {
+            return;
+        }
     }
 
     public override void Dead()
     {
+        states.alive = false;
         animator.enabled = false;
+        GameManager.instance.BroadcastEnemyHostility(1, 1000, false);
         gameObject.GetComponent<SpriteRenderer>().sortingLayerName = "GroundStuff";
         gameObject.GetComponent<SpriteRenderer>().sprite = deadSprite;
         foreach (BoxCollider2D boxCollider2D in gameObject.GetComponentsInChildren<BoxCollider2D>())

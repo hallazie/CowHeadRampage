@@ -11,6 +11,7 @@ static class WolfHeadAnimationStates
     public const string Sprint = "WH_Sprint";
     public const string Aim = "WH_Aim";
     public const string Shoot = "WH_Shoot";
+    public const string KnifeAttack = "WH_KnifeAttack";
 }
 
 public class WolfHeadAnimationController: PawnAnimationController
@@ -64,7 +65,7 @@ public class WolfHeadAnimationController: PawnAnimationController
                 {
                     if (controller.states.allowAttack)
                     {
-                        PlayAnimation(WolfHeadAnimationStates.FistAttack);
+                        PlayAnimation(WolfHeadAnimationStates.KnifeAttack);
                     }
                     else
                     {
