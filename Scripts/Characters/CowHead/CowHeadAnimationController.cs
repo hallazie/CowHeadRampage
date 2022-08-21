@@ -15,6 +15,7 @@ static class CowHeadAnimationStates
     // public const string Combo2 = "CH_Combo2";
     public const string Combo1 = "CH2_FistAttack1";
     public const string Combo2 = "CH2_FistAttack2";
+    public const string Combo12 = "CH2_FistAttack12";
     public const string WeaveLeft = "CH2_WeaveLeft";
     public const string WeaveRight = "CH2_WeaveRight";
     public const string IdleBoxing = "CH2_IdleBoxing";
@@ -59,6 +60,11 @@ public class CowHeadAnimationController: PawnAnimationController
         else if(controller.states.attack && controller.states.comboStep == 1)
         {
             PlayAnimation(CowHeadAnimationStates.Combo2, false);
+            return;
+        }
+        else if (controller.states.attack && controller.states.comboStep == 2)
+        {
+            PlayAnimation(CowHeadAnimationStates.Combo12, false);
             return;
         }
         else if (controller.states.moveSpeed > 0)

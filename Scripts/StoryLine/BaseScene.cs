@@ -4,14 +4,12 @@ using UnityEngine;
 
 public class BaseScene : MonoBehaviour
 {
-    public SceneController sceneController;
-
     public bool activated;
 
     public IEnumerator LoadScene()
     {
         yield return new WaitForSeconds(2f);
-        sceneController.LoadNextScene();
+        SceneController.instance.LoadNextScene();
     }
 
 }

@@ -9,6 +9,7 @@ public class GameManager : MonoBehaviour
     public CameraShake cameraShaker;
     public SystemManager systemManager;
     public NavGridManager navGridManager;
+    public SoundController SoundController;
 
 
     // Singleton Pattern
@@ -44,8 +45,7 @@ public bool playerAlive = true;
 
     void Start()
     {
-        // Cursor.visible = false;
-        // Physics2D.IgnoreLayerCollision(layerDict["Enemy"], layerDict["Enemy"]);
+
     }
 
     void Update()
@@ -77,13 +77,21 @@ public bool playerAlive = true;
         WolfHeadController[] wolfHeadList = FindObjectsOfType<WolfHeadController>();
         foreach (WolfHeadController wolfHead in wolfHeadList)
         {
-            if (wolfHead.states.playerVisible)
+            if (!wolfHead.states.alive)
             {
-                wolfHead.states.hostilityLevel = hostilityLevel;
+                continue;
             }
-            if (!requiredVisible && (wolfHead.transform.position - cowHead.transform.position).magnitude <= range)
+            if ((wolfHead.transform.position - cowHead.transform.position).magnitude <= range)
             {
-                wolfHead.states.hostilityLevel = hostilityLevel;
+                if (wolfHead.states.playerVisible) 
+                {
+                    wolfHead.states.hostilityLevel = hostilityLevel;
+                }
+                else
+                {
+                    wolfHead.states.hostilityLevel = hostilityLevel - 1;
+                }
+                continue;
             }
         }
     }

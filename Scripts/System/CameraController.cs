@@ -14,7 +14,7 @@ public class CameraController : MonoBehaviour
     private bool startOverlook = false;
     private bool keepOverlook = false;
 
-    private float cameraHeight = -10f;
+    public float cameraHeight = -20f;
 
     // Start is called before the first frame update
     void Start()
@@ -42,7 +42,7 @@ public class CameraController : MonoBehaviour
         if (startOverlook)
         {
             Vector3 nextPosition = new Vector3(mousePosition.x, mousePosition.y, cameraHeight);
-            //gameObject.transform.position = new Vector3(mousePosition.x, mousePosition.y, cameraHeight);
+            // gameObject.transform.position = new Vector3(mousePosition.x, mousePosition.y, cameraHeight);
             gameObject.transform.position = Vector3.Lerp(gameObject.transform.position, nextPosition, Time.deltaTime * cameraMoveSpeed);
         }
         else if (keepOverlook)

@@ -63,7 +63,7 @@ Camera:
   far clip plane: 1000
   field of view: 60
   orthographic: 1
-  orthographic size: 3
+  orthographic size: 6
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
@@ -134,6 +134,7 @@ MonoBehaviour:
   cowHead: {fileID: 0}
   maxOverlookDistance: 15
   cameraMoveSpeed: 20
+  cameraHeight: -20
 --- !u!114 &7875553808654442892
 MonoBehaviour:
   m_ObjectHideFlags: 0

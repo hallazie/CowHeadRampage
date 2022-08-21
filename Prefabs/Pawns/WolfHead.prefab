@@ -80,18 +80,19 @@ MonoBehaviour:
   - {fileID: 21300000, guid: 7e6dabc5bcb88604487180ddf1e2addf, type: 3}
   rgdbody: {fileID: 0}
   characterType: WolfHead
-  runSpeed: 3
+  runSpeed: 8
   sprintFactor: 2
-  visionRange: 10
-  sprintRange: 6
-  fistAttackRange: 0.5
-  minContactRange: 0.25
+  visionRange: 20
+  sprintRange: 12
+  fistAttackRange: 0.75
+  minContactRange: 0.5
   drawGizmos: 0
-  interactRange: 1
+  interactRange: 2
   gizmosRange: 2
-  hostileDuration: 5
+  hostileDuration: 60
+  minNavDestinationDist: 0.1
   shootProbability: 0.3
-  maxShootRange: 3
+  maxShootRange: 8
   aimingMinTime: 0.5
   aimingMaxTime: 1
   attackDamage: 10
@@ -163,18 +164,18 @@ BoxCollider2D:
   m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: -0.058645487, y: -0.13176513}
+  m_Offset: {x: -0.11702162, y: -0.2201184}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
-    oldSize: {x: 1, y: 1}
+    oldSize: {x: 2, y: 2}
     newSize: {x: 0.72, y: 0.72}
     adaptiveTilingThreshold: 0.5
     drawMode: 0
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 0.287647, y: 0.2586186}
+  m_Size: {x: 0.8461641, y: 0.5362997}
   m_EdgeRadius: 0
 --- !u!50 &1485445418320543925
 Rigidbody2D:
@@ -224,7 +225,7 @@ MonoBehaviour:
   - {x: -0.5203928, y: 0.0249241, z: 0}
   m_ShapePathHash: 1472703593
   m_Mesh: {fileID: 0}
-  m_InstanceId: 50356
+  m_InstanceId: 52454
 --- !u!1 &1698532945638168398
 GameObject:
   m_ObjectHideFlags: 0

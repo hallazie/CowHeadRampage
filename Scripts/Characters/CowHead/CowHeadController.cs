@@ -42,6 +42,7 @@ public class CowHeadController : AttackablePawn
     public Sprite deadSprite;
     public Rigidbody2D rgdbody;
     public BoxCollider2D boxCollider;
+    public BoxCollider2D damageCollider;
 
     public string characterType = "CowHead";
     public float runSpeed = 5f;
@@ -57,9 +58,9 @@ public class CowHeadController : AttackablePawn
 
     private void Awake()
     {
+        states = new CowHeadState();
         weapon = GetComponentInChildren<MeleeWeapon>();
         weapon.Init(attackDamage: attackDamage, fontColor: knifeDamageColor);
-        states = new CowHeadState();
 
         rgdbody = GetComponent<Rigidbody2D>();
         boxCollider = GetComponent<BoxCollider2D>();
@@ -70,6 +71,10 @@ public class CowHeadController : AttackablePawn
     // Start is called before the first frame update
     void Start()
     {
+        if (states == null)
+        {
+            states = new CowHeadState();
+        }
         states.alive = true;
         states.health = maxHealth;
     }
@@ -95,10 +100,20 @@ public class CowHeadController : AttackablePawn
 
     private void UpdateStates()
     {
+        bool inputAttack = Input.GetMouseButton(0) || Input.GetMouseButtonDown(0);
+
         states.horizontalSpeed = Input.GetAxisRaw("Horizontal");    
         states.verticalSpeed = Input.GetAxisRaw("Vertical");
         states.moveSpeed = Mathf.Sqrt(states.horizontalSpeed * states.horizontalSpeed + states.verticalSpeed * states.verticalSpeed);
-        states.attack = Input.GetMouseButton(0) || Input.GetMouseButtonDown(0) || states.attack;
+        //if (!states.attack && inputAttack)
+        //{
+        //    if (Time.time - states.lastAttackTime < 0.1f)
+        //    {
+        //        states.comboStep = 2;
+        //    }
+        //    states.lastAttackTime = Time.time;
+        //}
+        states.attack = inputAttack || states.attack;
         states.lookAtDirection = ((Vector2)Camera.main.ScreenToWorldPoint(Input.mousePosition) - (Vector2)transform.position).normalized;
         states.movementDirection = new Vector2(states.horizontalSpeed, states.verticalSpeed).normalized;
 
@@ -151,7 +166,9 @@ public class CowHeadController : AttackablePawn
             gameObject.transform.position += new Vector3(states.horizontalSpeed * Time.deltaTime * runSpeed * sprintMultiplier, states.verticalSpeed * Time.deltaTime * runSpeed * sprintMultiplier, 0);
         }
         transform.up = states.lookAtDirection; 
-
+        // float rotZ = Mathf.Atan2(states.lookAtDirection.y, states.lookAtDirection.x) * Mathf.Rad2Deg;
+        // transform.rotation = Quaternion.Euler(0f, 0f, rotZ - 90);
+        // transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.Euler(0f, 0f, rotZ - 90), 1f);
     }
 
     public void StartConversation()
@@ -166,6 +183,7 @@ public class CowHeadController : AttackablePawn
 
     public void StopAnimation()
     {
+        UnfreezeMovement();
         animationController.StopAnimation();
     }
 
@@ -222,6 +240,18 @@ public class CowHeadController : AttackablePawn
         states.lastBoxingTime = Time.time;
     }
 
+    public void EnterCutscene()
+    {
+        boxCollider.enabled = false;
+        damageCollider.enabled = false;
+    }
+
+    public void ExitCutscene()
+    {
+        boxCollider.enabled = true;
+        damageCollider.enabled = true;
+    }
+
 
     // ---------------------------- OVERRIDE ATTACKABLE PAWN ----------------------------
 
@@ -253,9 +283,9 @@ public class CowHeadController : AttackablePawn
 
     public override void CauseDamage()
     {
-        weapon.OnAttack("Enemy", ignoringTags: new List<string> { "Bullet", "Weapon", "Player", "Enemy" });
+        weapon.OnAttack("Enemy", showAttackEffect: true, ignoringTags: new List<string> { "Bullet", "Weapon", "Player", "Enemy" });
         weapon.OnAttack("Bullet", sendDamagedEffect: false, showDamage: false, visualConditional: false);
-        weapon.OnAttack("InteractableEnvironment", sendDamage: true, sendDamagedEffect: true, showDamage: false, visualConditional: false);
+        weapon.OnAttack("InteractableEnvironment", sendDamage: true, sendDamagedEffect: true, showDamage: false, showAttackEffect: true, visualConditional: false);
     }
 
     public override void ReceiveDamage(MessageReceiveDamage message)
@@ -278,7 +308,9 @@ public class CowHeadController : AttackablePawn
 
     public override void AttackEffect(MessageAttackEffect message)
     {
-
+        print("hitting " + weapon.singleRoundHit.Count + "items");
+        // GameManager.instance.SoundController.PlaySoundMultipleTimes(SoundNames.CowHeadPunch, weapon.singleRoundHit.Count, 0.1f);
+        GameManager.instance.SoundController.PlaySound(SoundNames.CowHeadPunch);
     }
 
     public override void DamagedEffect(MessageAttackEffect message)

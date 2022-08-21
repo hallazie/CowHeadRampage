@@ -56,7 +56,7 @@ public class MeleeWeapon : MonoBehaviour
 
     } 
 
-    public void OnAttack(string targetTag, bool sendDamage = true, bool sendDamagedEffect = true, bool showDamage = true, List<string> ignoringTags = null, bool visualConditional = true)
+    public void OnAttack(string targetTag, bool sendDamage = true, bool sendDamagedEffect = true, bool showAttackEffect = false, bool showDamage = true, List<string> ignoringTags = null, bool visualConditional = true)
     {
         if (enableDamage)
         {
@@ -80,6 +80,11 @@ public class MeleeWeapon : MonoBehaviour
                         weaponHits[i].gameObject.SendMessage("DamagedEffect", new MessageAttackEffect(origin: transform.parent.position, target: weaponHits[i].transform.position, contactPosition: Vector3.zero));
                     }
                     singleRoundHit.Add(weaponHits[i].gameObject);
+                    if (showAttackEffect)
+                    {
+                        // showAttackEffect传递给攻击发起方
+                        transform.parent.gameObject.SendMessage("AttackEffect", new MessageAttackEffect(origin: transform.parent.position, target: weaponHits[i].transform.position, contactPosition: Vector3.zero));
+                    }
                 }
 
             // clear after logics

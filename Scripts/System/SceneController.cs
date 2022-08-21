@@ -16,6 +16,7 @@ public class SceneController : MonoBehaviour
 
     private void Awake()
     {
+        print("SceneController Initiated:" + this);
         if (_instance != null && _instance != this)
         {
             Destroy(this.gameObject);

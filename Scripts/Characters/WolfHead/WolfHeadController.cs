@@ -48,6 +48,7 @@ public class WolfHeadController : AttackablePawn
     public float interactRange = 1f;
     public float gizmosRange = 1f;
     public float hostileDuration = 5f;
+    public float minNavDestinationDist = 0.1f;
 
     public float shootProbability = 0.5f;
     public float maxShootRange = 3f;
@@ -121,6 +122,10 @@ public class WolfHeadController : AttackablePawn
         }
         else
         {
+            if (states.hostilityLevel == 2)
+            {
+                states.hostilityLevel = 3;
+            }
             // 目标可见
             lastSawPlayerTime = Time.time;
             float shootProb = Random.Range(0f, 1f);
@@ -159,19 +164,6 @@ public class WolfHeadController : AttackablePawn
             {
                 // TODO 判断destination是否改变，若改变再重新进行ASTAR算法，减少消耗。
                 hostileNavQueue = GameManager.instance.navGridManager.FindVertexQueue(transform.position, cowHead.transform.position);
-                //if (hostileNavQueue != null)
-                //{
-                //    hostileNavList = new List<Vector3>();
-                //    while (hostileNavQueue.Count > 0)
-                //    {
-                //        hostileNavList.Add(hostileNavQueue.Dequeue());
-                //    }
-                //    hostileNavQueue.Clear();
-                //    foreach (Vector3 pos in hostileNavList)
-                //    {
-                //        hostileNavQueue.Enqueue(pos);
-                //    }
-                //}
             }
 
             // 敌对模式
@@ -190,12 +182,14 @@ public class WolfHeadController : AttackablePawn
                 // movement
                 if (hostileNavQueue != null)
                 {
+                    Physics2D.IgnoreLayerCollision(GameManager.instance.layerDict["Enemy"], GameManager.instance.layerDict["Enemy"], ignore: true);
+
                     Vector2 navMovePosition = (Vector2)(transform.position - nextNavPosition);
-                    if (nextNavPosition == Vector3.zero || navMovePosition.magnitude <= 0.01f && hostileNavQueue != null && hostileNavQueue.Count > 0)
+                    if (nextNavPosition == Vector3.zero || navMovePosition.magnitude <= minNavDestinationDist && hostileNavQueue != null && hostileNavQueue.Count > 0)
                     {
                         nextNavPosition = hostileNavQueue.Dequeue();
                     }
-                    else if (navMovePosition.magnitude <= 0.01f && hostileNavQueue != null && hostileNavQueue.Count == 0)
+                    else if (navMovePosition.magnitude <= minNavDestinationDist && hostileNavQueue != null && hostileNavQueue.Count == 0)
                     {
                         states.lostTrack = true;
                         states.moveSpeed = 0f;
@@ -217,6 +211,10 @@ public class WolfHeadController : AttackablePawn
                             states.moveSpeed = 0f;
                         }
                     }
+                }
+                else
+                {
+                    Physics2D.IgnoreLayerCollision(GameManager.instance.layerDict["Enemy"], GameManager.instance.layerDict["Enemy"], ignore: false);
                 }
 
                 //// no use nav
@@ -305,7 +303,7 @@ public class WolfHeadController : AttackablePawn
     public void StopConversation()
     {
         DialogueManager.instance.EndDialogue();
-        GameManager.instance.BroadcastEnemyHostility();
+        GameManager.instance.BroadcastEnemyHostility(range: 20f, requiredVisible: true) ;
         // states.hostilityLevel = 3;
         // StartCoroutine(DelayExecuting(1));
     }
@@ -449,7 +447,7 @@ public class WolfHeadController : AttackablePawn
 
     public override void ReceiveDamage(MessageReceiveDamage message)
     {
-        GameManager.instance.BroadcastEnemyHostility();
+        GameManager.instance.BroadcastEnemyHostility(range: 100f, requiredVisible: false);
         // FloatingTextManager.instance.ShowBasic("-" + message.damageAmount.ToString(), Color.blue, gameObject.transform.position, Vector3.up * 64, duration: 2f, fontSize: 32);
 
         states.health -= message.damageAmount;
