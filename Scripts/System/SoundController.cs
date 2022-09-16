@@ -5,7 +5,7 @@ using UnityEngine.Audio;
 
 public class SoundNames
 {
-    public const string CowHeadPunch = "CowHeadPunch";
+    public const string FatherPunch = "FatherPunch";
 }
 
 public class SoundController : MonoBehaviour
@@ -27,6 +27,19 @@ public class SoundController : MonoBehaviour
         SoundItem sound = System.Array.Find(soundList, x => x.name == soundName);
         if (sound != null)
         {
+            sound.source.Play();
+        }
+    }
+
+    public void PlaySound(string soundName, Vector3 position)
+    {
+        /*
+         position 采用屏幕坐标系
+         */
+        SoundItem sound = System.Array.Find(soundList, x => x.name == soundName);
+        if (sound != null)
+        {
+            sound.source.transform.position = position;
             sound.source.Play();
         }
     }

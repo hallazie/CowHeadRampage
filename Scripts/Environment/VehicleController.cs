@@ -1,29 +1,40 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Audio;
 
 public class VehicleController : MonoBehaviour
 {
+
+    public List<Sprite> spriteList;
+    public Sprite sprite;
+
     private AudioSource source;
     private Animator animator;
-    private Sprite sprite;
 
     private float alertDuration;
     private float alertStartTime;
 
     public void Awake()
     {
-        source = GetComponent<AudioSource>();
-        animator = GetComponent<Animator>();
-        sprite = GetComponent<SpriteRenderer>().sprite;
-        alertDuration = source.clip.length;
-        source.Stop();
-        animator.enabled = false;
+        if (sprite == null)
+        {
+            int index = Random.Range(0, spriteList.Count);
+            GetComponent<SpriteRenderer>().sprite = spriteList[index];
+        }
+        else
+        {
+            GetComponent<SpriteRenderer>().sprite = sprite;
+        }
+        // source = GetComponent<AudioSource>();
+        // animator = GetComponent<Animator>();
+        // alertDuration = source.clip.length;
+        // source.Stop();
+        // animator.enabled = false;
     }
 
     private void Update()
     {
+        return;
         if (Time.time - alertStartTime >= alertDuration)
         {
             animator.enabled = false;

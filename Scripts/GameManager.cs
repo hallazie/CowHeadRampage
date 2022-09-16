@@ -4,11 +4,11 @@ using UnityEngine;
 
 public class GameManager : MonoBehaviour
 {
-    public CowHeadController cowHead;
+    public FatherController father;
     public EffectDisplayController effectDisplayController;
-    public CameraShake cameraShaker;
-    public SystemManager systemManager;
-    public NavGridManager navGridManager;
+    public CameraController cameraController;
+    // public SystemManager systemManager;
+    // public NavGridManager navGridManager;
     public SoundController SoundController;
 
 
@@ -32,10 +32,10 @@ public class GameManager : MonoBehaviour
         {
             _instance = this;
         }
-        systemManager = new SystemManager();
-}
+        // systemManager = new SystemManager();
+    }
 
-public bool playerAlive = true;
+    public bool playerAlive = true;
 
     public Dictionary<string, int> layerDict = new Dictionary<string, int>{
         {"Player", 8 },
@@ -50,46 +50,47 @@ public bool playerAlive = true;
 
     void Update()
     {
-        if (cowHead == null)
+        if (father == null)
         {
             return;
         }
-        if (Input.GetKeyDown(KeyCode.R) && !cowHead.states.alive) {
+        if (Input.GetKeyDown(KeyCode.R) && !father.states.alive)
+        {
             playerAlive = true;
-            cowHead.Respawn();
+            // father.Respawn();
         }
         if (Input.GetKeyDown(KeyCode.U))
         {
             foreach (GameObject enemy in GameObject.FindGameObjectsWithTag("Enemy"))
             {
                 enemy.SendMessage("Respawn");
-            } 
+            }
         }
     }
 
     public void ShakeCamera(float duration = 0.15f, float magnitude = 0.05f, int frameGap = 10)
     {
-        StartCoroutine(cameraShaker.Shake(duration, magnitude, frameGap));
+        StartCoroutine(cameraController.Shake(duration, magnitude, frameGap));
     }
 
     public void BroadcastEnemyHostility(int hostilityLevel = 3, float range = 10f, bool requiredVisible = false)
     {
-        WolfHeadController[] wolfHeadList = FindObjectsOfType<WolfHeadController>();
-        foreach (WolfHeadController wolfHead in wolfHeadList)
+        EnemyController[] enemyList = FindObjectsOfType<EnemyController>();
+        foreach (EnemyController enemy in enemyList)
         {
-            if (!wolfHead.states.alive)
+            if (!enemy.states.alive)
             {
                 continue;
             }
-            if ((wolfHead.transform.position - cowHead.transform.position).magnitude <= range)
+            if ((enemy.transform.position - father.transform.position).magnitude <= range)
             {
-                if (wolfHead.states.playerVisible) 
+                if (enemy.states.playerVisible)
                 {
-                    wolfHead.states.hostilityLevel = hostilityLevel;
+                    enemy.states.hostilityLevel = hostilityLevel;
                 }
                 else
                 {
-                    wolfHead.states.hostilityLevel = hostilityLevel - 1;
+                    enemy.states.hostilityLevel = hostilityLevel - 1;
                 }
                 continue;
             }

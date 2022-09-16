@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 public abstract class PawnAnimationController
 {
@@ -8,13 +6,20 @@ public abstract class PawnAnimationController
     protected string previousAnimationName;
     protected bool isPlaying;
 
-    public abstract void PlayAnimation(string animationName, bool overwrite = false);
+    protected Animator animator;
 
-    public void StopAnimation()
+    public abstract void UpdateAnimationParameter();
+
+    public virtual void PlayAnimation(string animationName, bool overwrite = false) {
+        isPlaying = true;
+        animator.Play(animationName);
+        currentAnimationName = animationName;
+    }
+
+    public virtual void StopAnimation()
     {
         isPlaying = false;
         previousAnimationName = currentAnimationName;
         currentAnimationName = null;
     }
-
 }

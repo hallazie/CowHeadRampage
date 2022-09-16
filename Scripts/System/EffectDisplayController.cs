@@ -5,35 +5,35 @@ using UnityEngine;
 public class EffectDisplayController : MonoBehaviour
 {
 
-    public List<GameObject> bloodSpriteList = new List<GameObject>();
-    public List<GameObject> blastSpriteList = new List<GameObject>();
+    public GameObject bloodSpreadObj;
+    public GameObject meatImpactObj;
+    public GameObject blastEffectObj;
 
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
+    public GameObject rainDropObj;
 
     public void DrawBloodSpread(Vector3 position, Vector3 rotation)
     {
-        int index = Random.Range(0, bloodSpriteList.Count);
-        GameObject blood = Instantiate(bloodSpriteList[index], gameObject.transform);
+        GameObject blood = Instantiate(bloodSpreadObj, gameObject.transform);
         blood.GetComponent<SpriteRenderer>().sortingLayerName = "GroundStuff";
         blood.transform.position = position;
         blood.transform.up = rotation;
-        // print("blood spread!");
+    }
+
+    public void PlayMeatImpactEffect(Vector3 position)
+    {
+        GameObject impact = Instantiate(meatImpactObj, position, Quaternion.identity);
+        Destroy(impact, 5);
     }
 
     public void PlayBlastEffect(Vector3 position)
     {
-        int index = Random.Range(0, blastSpriteList.Count);
-        GameObject blast = Instantiate(blastSpriteList[index], position, Quaternion.identity);
+        GameObject blast = Instantiate(blastEffectObj, position, Quaternion.identity);
         Destroy(blast, 5);
+    }
+
+    public void PlayRainDrop(Vector3 position)
+    {
+        GameObject raindrop = Instantiate(rainDropObj, position, Quaternion.identity);
+        Destroy(raindrop, 2);
     }
 }

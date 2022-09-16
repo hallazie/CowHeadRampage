@@ -42,7 +42,7 @@ public class MeleeWeapon : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        
+
     }
 
     // Update is called once per frame
@@ -54,7 +54,7 @@ public class MeleeWeapon : MonoBehaviour
     void OnCollisionEnter2D()
     {
 
-    } 
+    }
 
     public void OnAttack(string targetTag, bool sendDamage = true, bool sendDamagedEffect = true, bool showAttackEffect = false, bool showDamage = true, List<string> ignoringTags = null, bool visualConditional = true)
     {
@@ -67,7 +67,7 @@ public class MeleeWeapon : MonoBehaviour
                 {
                     continue;
                 }
-                bool visible = visualConditional ? VisionUtils.CanSeeEachOther(transform.parent.gameObject, weaponHits[i].gameObject, ignoringTags) : true;
+                bool visible = visualConditional ? VisionUtil.CanSeeEachOther(transform.parent.gameObject, weaponHits[i].gameObject, ignoringTags) : true;
                 if (visible && weaponHits[i].tag == targetTag && !singleRoundHit.Contains(weaponHits[i].gameObject))
                 {
                     if (sendDamage)
@@ -87,8 +87,8 @@ public class MeleeWeapon : MonoBehaviour
                     }
                 }
 
-            // clear after logics
-            weaponHits[i] = null;
+                // clear after logics
+                weaponHits[i] = null;
             }
         }
     }

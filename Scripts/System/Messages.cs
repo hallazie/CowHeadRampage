@@ -1,9 +1,7 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
-
-public class MessageInstantiateBullet{
+public class MessageInstantiateBullet
+{
 
     public string targetTag;
     public string sourceTag;
@@ -46,3 +44,4 @@ public class MessageReceiveDamage
         this.damageAmount = damageAmount;
     }
 }
+

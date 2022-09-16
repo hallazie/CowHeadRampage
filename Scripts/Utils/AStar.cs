@@ -167,6 +167,7 @@ public class GridVertex
 
     public void AddNeighboors(GridVertex[,] grid, int x, int y)
     {
+        // up + left + right + down
         if (x < grid.GetUpperBound(0))
             Neighboors.Add(grid[x + 1, y]);
         if (x > 0)
@@ -176,6 +177,7 @@ public class GridVertex
         if (y > 0)
             Neighboors.Add(grid[x, y - 1]);
 
+        // 45 degrees
         if (x < grid.GetUpperBound(0) && y < grid.GetUpperBound(1))
             Neighboors.Add(grid[x + 1, y + 1]);
         if (x > 0 && y > 0)
