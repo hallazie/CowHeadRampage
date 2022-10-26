@@ -7,6 +7,7 @@ public abstract class HumanPawn : MonoBehaviour
 
     public PawnAnimationController animationController;
 
+
     // 根据 Hidden State + Outside Input 更新 Pawn 的 Hidden State
     public abstract void UpdateStates();
 
@@ -24,6 +25,11 @@ public abstract class HumanPawn : MonoBehaviour
     public virtual void StopAnimation()
     {
         animationController.StopAnimation();
+    }
+
+    public virtual void MoveToDestination()
+    {
+
     }
 
 }

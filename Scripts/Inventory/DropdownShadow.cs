@@ -6,11 +6,13 @@ public class DropdownShadow : MonoBehaviour
 {
     public Material shadowMaterial;
     public bool staticObj = true;
+    public bool useParentTrans = false;
 
     public Vector2 baseDir = new Vector2(1, -1);
     public float shadowSize = 0.2f;
 
-    void Start()
+
+    void Awake()
     {
         shadowMaterial = GetComponent<SpriteRenderer>().material;
         OffsetShadow();
@@ -25,7 +27,7 @@ public class DropdownShadow : MonoBehaviour
         OffsetShadow();
     }
 
-    private void OffsetShadow()
+    public void OffsetShadow()
     {
         float degree = transform.rotation.eulerAngles.z;
         float sine = Mathf.Sin(degree * Mathf.PI / 180);

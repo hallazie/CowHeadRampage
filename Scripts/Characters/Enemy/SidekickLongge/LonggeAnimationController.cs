@@ -15,10 +15,11 @@ public class LonggeAnimationController : PawnAnimationController
 
     public LonggeController controller;
 
-    public LonggeAnimationController(LonggeController controller, Animator animator)
+    public LonggeAnimationController(LonggeController controller)
     {
         this.controller = controller;
-        this.animator = animator;
+        this.animator = controller.GetComponent<Animator>();
+        this.renderer = controller.GetComponent<SpriteRenderer>();
     }
 
     public override void UpdateAnimationParameter()

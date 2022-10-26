@@ -69,6 +69,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   animator: {fileID: -7434522186279941613}
   deadSprite: {fileID: 21300000, guid: c7ea0323ec83931439b4047c53193011, type: 3}
+  rigidbody: {fileID: 0}
+  walkSpeed: 5
+  runSpeed: 15
+  bleedAmount: 10
 --- !u!212 &-8581608921912901376
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -107,7 +111,7 @@ SpriteRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: -1118516347
-  m_SortingLayer: 2
+  m_SortingLayer: 4
   m_SortingOrder: 0
   m_Sprite: {fileID: 182478040331424458, guid: 8686b5250ccc71c4da0d14f735fe1840, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -180,6 +184,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   shadowMaterial: {fileID: 0}
-  staticObj: 1
+  staticObj: 0
+  useParentTrans: 0
   baseDir: {x: 1, y: -1}
   shadowSize: 0.1

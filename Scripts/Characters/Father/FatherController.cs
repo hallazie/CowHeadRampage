@@ -9,13 +9,16 @@ public class FatherState
     public bool alive = true;
     public bool occupied = false;
     public bool freezeMovement = false;
-    public bool move = false;
-    public bool attack = false;
+    public bool moving = false;
+    public bool meleeAttacking = false;
     public bool flash = false;
     public bool sprint = false;
-    public bool weave = false;
+    public bool weaving = false;
     public bool invincible = false;
     public bool idleBoxing = false;
+    public bool tryGrab = false;
+    public bool grabbingItem = false;
+    public bool throwing = false;
 
     public float horizontalSpeed;
     public float verticalSpeed;
@@ -27,6 +30,7 @@ public class FatherState
 
     public Vector2 lookAtDirection;
     public Vector2 movementDirection;
+    public Vector2 flashDirection;
 
     public int comboStep;
 
@@ -41,6 +45,11 @@ public class FatherController : HumanPawn
 
     public FatherState states;
     public MeleeWeapon weapon;
+    public FistController fist;
+
+    public ThrowableItem throwableItem;
+
+    // public ThrowableEnemy throwableEnemy;
 
     // =================================== Basic Attributes ===================================
 
@@ -57,13 +66,15 @@ public class FatherController : HumanPawn
         states = new FatherState();
         weapon = GetComponentInChildren<MeleeWeapon>();
         weapon.Init(attackDamage: attackDamage, fontColor: Color.red);
+        fist = GetComponentInChildren<FistController>();
 
         animationController = new FatherAnimationController(this, animator);
+
     }
 
     void Start()
     {
-        
+        states.moveSpeed = walkSpeed;
     }
 
     void Update()
@@ -80,19 +91,23 @@ public class FatherController : HumanPawn
     {
         bool inputAttack = Input.GetMouseButton(0) || Input.GetMouseButtonDown(0);
         bool inputFlash = Input.GetKeyDown(KeyCode.Space);
+        bool inputGrab = Input.GetMouseButtonDown(1);
 
         states.horizontalSpeed = Input.GetAxisRaw("Horizontal");
         states.verticalSpeed = Input.GetAxisRaw("Vertical");
 
-        states.move = Mathf.Abs(states.horizontalSpeed) > 0 || Mathf.Abs(states.verticalSpeed) > 0;
-        states.moveSpeed = Mathf.Sqrt(states.horizontalSpeed * states.horizontalSpeed + states.verticalSpeed * states.verticalSpeed);
+        states.moving = Mathf.Abs(states.horizontalSpeed) > 0 || Mathf.Abs(states.verticalSpeed) > 0;
+        // states.moveSpeed = Mathf.Sqrt(states.horizontalSpeed * states.horizontalSpeed + states.verticalSpeed * states.verticalSpeed);
 
         states.lookAtDirection = ((Vector2)Camera.main.ScreenToWorldPoint(Input.mousePosition) - (Vector2)transform.position).normalized;
         states.movementDirection = new Vector2(states.horizontalSpeed, states.verticalSpeed).normalized;
+        states.flashDirection = states.movementDirection.magnitude > 0.1f ? states.movementDirection : states.flashDirection;
 
-        states.attack = inputAttack || states.attack;
-        states.flash = inputFlash && states.move && Time.time > states.lastFlashTime + flashGap || states.flash; 
-        
+        states.meleeAttacking = inputAttack || states.meleeAttacking;
+        states.flash = inputFlash && states.moving && Time.time > states.lastFlashTime + flashGap || states.flash;
+
+        states.tryGrab = inputGrab && !states.grabbingItem || states.tryGrab;
+        states.throwing = inputGrab && !states.tryGrab && states.grabbingItem || states.throwing;
     }
 
     public override void UpdateAnimation()
@@ -110,7 +125,7 @@ public class FatherController : HumanPawn
             return;
         if (!states.sprint)
         {
-            gameObject.transform.position += new Vector3(states.horizontalSpeed * Time.deltaTime * walkSpeed, states.verticalSpeed * Time.deltaTime * walkSpeed, 0);
+            gameObject.transform.position += new Vector3(states.horizontalSpeed * Time.deltaTime * states.moveSpeed, states.verticalSpeed * Time.deltaTime * states.moveSpeed, 0);
         }
         else if (states.flash && false)
         {
@@ -136,10 +151,18 @@ public class FatherController : HumanPawn
 
     public override void UpdateBehaviour()
     {
-        if (states.attack)
+        if (states.meleeAttacking)
         {
             CauseDamage();
         }
+        if (states.tryGrab)
+        {
+            TryGrabItemOrEnemy();
+        }
+        //if (states.throwing)
+        //{
+        //    ThrowGrabbedItem();
+        //}
     }
 
     // =================================== Behaviour Events ===================================
@@ -153,7 +176,7 @@ public class FatherController : HumanPawn
 
     public void ReceiveDamage(MessageReceiveDamage message)
     {
-        if (states.weave && states.invincible)
+        if (states.weaving && states.invincible)
         {
             return;
         }
@@ -177,7 +200,7 @@ public class FatherController : HumanPawn
 
     public void DamagedEffect(MessageAttackEffect message)
     {
-        if (states.weave && states.invincible)
+        if (states.weaving && states.invincible)
         {
             return;
         }
@@ -196,6 +219,49 @@ public class FatherController : HumanPawn
         }
     }
 
+    public void TryGrabItemOrEnemy()
+    {
+        if (states.grabbingItem)
+        {
+            return;
+        }
+        GrabableItem item = fist.OnGrab();
+        if (item != null)
+        {
+            bool flag = throwableItem.ActivateByGrabableItem(item);
+            if (flag)
+            {
+                fist.enableGrab = false;
+                states.grabbingItem = true;
+                states.tryGrab = false;
+                item.Grabbed();
+            }
+        }
+
+        //GrabableItem[] itemList = FindObjectsOfType<GrabableItem>();
+        //foreach (GrabableItem item in itemList)
+        //{
+        //    if (((Vector2)(item.transform.position - transform.position)).magnitude < 5)
+        //    {
+        //        item.Grabbed();
+        //        bool flag = throwableItem.ActivateByGrabableItem(item);
+        //        if (flag)
+        //        {
+        //            states.grabbingItem = true;
+        //            break;
+        //        }
+        //    }
+        //}
+    }
+
+    public void ThrowGrabbedItem()
+    {
+        throwableItem.ThrowAtDirection(states.lookAtDirection, 10f);
+        states.tryGrab = false;
+        states.grabbingItem = false;
+        states.throwing = false;
+    }
+
     // =================================== Animation Events ===================================
 
     public override void StopAnimation()
@@ -206,8 +272,9 @@ public class FatherController : HumanPawn
 
     public void FreezeMovement()
     {
-        states.freezeMovement = true;
-        if (states.weave)
+        // states.freezeMovement = true;
+        states.moveSpeed = walkSpeed / 3f;
+        if (states.weaving)
         {
             states.invincible = true;
         }
@@ -219,44 +286,81 @@ public class FatherController : HumanPawn
 
     public void UnfreezeMovement()
     {
-        states.freezeMovement = false;
-        if (states.weave)
+        // states.freezeMovement = false;
+        states.moveSpeed = walkSpeed;
+        if (states.weaving)
         {
             states.invincible = false;
         }
     }
 
-    public void StopAttack()
-    {
-        states.attack = false;
-        weapon.enableDamage = false;
-        weapon.singleRoundHit.Clear();
-        float randomIndex = Random.Range(0f, 1f);
-        if (randomIndex > 0.5)
-        {
-            states.comboStep = 1;
-        }
-        else
-        {
-            states.comboStep = 0;
-        }
-        states.idleBoxing = true;
-    }
-
     public void StartAttack()
     {
-        states.weave = false;
-        states.attack = true;
+        states.weaving = false;
+        states.meleeAttacking = true;
         weapon.enableDamage = true;
         weapon.singleRoundHit.Clear();
     }
 
+    public void StopAttack()
+    {
+        states.meleeAttacking = false;
+        weapon.enableDamage = false;
+        weapon.singleRoundHit.Clear();
+        int prevIndex = states.comboStep;
+        int randomIndex = Random.Range(0, 4);
+        // float jabProb = Random.Range(0f, 1f);
+        // if (jabProb > 0.4)
+        // {
+        //     randomIndex = 0;
+        // }
+        if (randomIndex != prevIndex || randomIndex == 0)
+        {
+            states.comboStep = randomIndex;
+        }
+        else
+        {
+            states.comboStep = (randomIndex + 1) % 4;
+        }
+        states.idleBoxing = true;
+    }
+
+    public void PrepareFlash()
+    {
+        GameManager.instance.effectDisplayController.PlayGroundDustDirected(transform.position, transform.rotation);
+    }
+
     public void StartFlash()
     {
-        float flashDistanceMin = VisionUtil.UnblockedDistance(gameObject, states.movementDirection, flashDistance, new List<string> { "Player", "Weapon" });
-        flashDestiny = gameObject.transform.position + (Vector3)states.movementDirection * flashDistanceMin;
-        gameObject.transform.position += (Vector3)states.movementDirection * flashDistanceMin;
+        float flashDistanceMin = VisionUtil.UnblockedDistance(gameObject, states.flashDirection, flashDistance, new List<string> { "Player", "Weapon" });
+        flashDestiny = gameObject.transform.position + (Vector3)states.flashDirection * flashDistanceMin;
+        gameObject.transform.position += (Vector3)states.flashDirection * flashDistanceMin;
         // gameObject.transform.position = Vector3.Lerp(gameObject.transform.position, flashDestiny, Time.deltaTime * flashSpeed);
+        GameManager.instance.effectDisplayController.PlayGroundDustCircle(transform.position);
         states.flash = false;
+    }
+
+    public void StartGrab()
+    {
+        states.tryGrab = true;
+        fist.enableGrab = true;
+    }
+
+    public void StopGrab()
+    {
+        states.tryGrab = false;
+        fist.enableGrab = false;
+    }
+
+    public void StartThrowGrabbedItem()
+    {
+        throwableItem.ThrowAtDirection(states.lookAtDirection, 10f);
+        states.tryGrab = false;
+        states.grabbingItem = false;
+    }
+
+    public void StopThrowGrabbedItem()
+    {
+        states.throwing = false;
     }
 }

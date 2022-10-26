@@ -4,11 +4,11 @@ using UnityEngine;
 
 public class GameManager : MonoBehaviour
 {
-    public FatherController father;
+    public PlayerController player;
     public EffectDisplayController effectDisplayController;
     public CameraController cameraController;
     // public SystemManager systemManager;
-    // public NavGridManager navGridManager;
+    public GridNavigationController gridNavController;
     public SoundController SoundController;
 
 
@@ -50,11 +50,11 @@ public class GameManager : MonoBehaviour
 
     void Update()
     {
-        if (father == null)
+        if (player == null)
         {
             return;
         }
-        if (Input.GetKeyDown(KeyCode.R) && !father.states.alive)
+        if (Input.GetKeyDown(KeyCode.R) && !player.states.alive)
         {
             playerAlive = true;
             // father.Respawn();
@@ -82,7 +82,7 @@ public class GameManager : MonoBehaviour
             {
                 continue;
             }
-            if ((enemy.transform.position - father.transform.position).magnitude <= range)
+            if ((enemy.transform.position - player.transform.position).magnitude <= range)
             {
                 if (enemy.states.playerVisible)
                 {

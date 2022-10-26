@@ -4,7 +4,8 @@ using UnityEngine;
 
 public class CameraController : MonoBehaviour
 {
-    public FatherController father;
+    // public FatherController father;
+    public PlayerController player;
     public float maxOverlookDistance = 15f;
     public float cameraMoveSpeed = 20f;
 
@@ -43,7 +44,7 @@ public class CameraController : MonoBehaviour
             elapsed += Time.deltaTime;
             if (counter % frameGap != 0)
             {
-                Vector3 position = GameManager.instance.father.transform.position;
+                Vector3 position = GameManager.instance.player.transform.position;
                 float x = Random.Range(-1f, 1f) * magnitude;
                 float y = Random.Range(-1f, 1f) * magnitude;
                 transform.position = new Vector3(position.x + x, position.y + y, transform.position.z);
@@ -63,14 +64,14 @@ public class CameraController : MonoBehaviour
         }
         else if (keepOverlook)
         {
-            Vector2 middlePosition = (mousePosition + (Vector2)father.transform.position) / 2f;
+            Vector2 middlePosition = (mousePosition + (Vector2)player.transform.position) / 2f;
             Vector3 nextPosition = new Vector3(middlePosition.x, middlePosition.y, cameraHeight);
             gameObject.transform.position = Vector3.Lerp(gameObject.transform.position, nextPosition, Time.deltaTime * cameraMoveSpeed);
         }
         else
         {
             Vector2 lookAt = distance.normalized;
-            Vector3 nextPosition = new Vector3(father.transform.position.x + pivotShift * lookAt.x, father.transform.position.y + pivotShift * lookAt.y, cameraHeight);
+            Vector3 nextPosition = new Vector3(player.transform.position.x + pivotShift * lookAt.x, player.transform.position.y + pivotShift * lookAt.y, cameraHeight);
             gameObject.transform.position = Vector3.Lerp(gameObject.transform.position, nextPosition, Time.deltaTime * cameraMoveSpeed);
         }
     }

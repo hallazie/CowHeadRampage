@@ -5,10 +5,23 @@ using UnityEngine;
 
 static class FatherAnimationStates
 {
-    public const string Idle = "FatherIdle";
+    // public const string Idle = "FatherIdle";
+    public const string Idle = "FatherIdleNude";
+    public const string GrabItenIdle = "FatherIdleGrab";
     public const string Walk = "FatherWalk";
-    public const string LeftCross = "FatherCrossLeft";
-    public const string RightCross = "FatherCrossRight";
+    public const string GrabItemWalk = "FatherGrabItemWalk";
+    public const string GrabItem = "FatherGrabItem";
+    public const string ThrowItem = "FatherThrowItem";
+
+    // public const string LeftCross = "FatherCrossLeft";
+    // public const string RightCross = "FatherCrossRight";
+    // public const string LeftHook = "FatherHookLeft";
+    // public const string RightHook = "FatherHookRight";
+    public const string LeftCross = "PlayerNudeJab";
+    public const string RightCross = "PlayerNudeCross";
+    public const string LeftHook = "PlayerNudeLeftHook";
+    public const string RightHook = "PlayerNudeRightHook";
+
     public const string FlashStart = "FatherFlashStart";
 
 }
@@ -34,33 +47,72 @@ public class FatherAnimationController : PawnAnimationController
         if (!controller.states.alive)
         {
             return;
-        }if (controller.states.flash)
+        }
+        else if (controller.states.tryGrab && !controller.states.grabbingItem)
+        {
+            PlayAnimation(FatherAnimationStates.GrabItem);
+        }
+        else if (controller.states.throwing)
+        {
+            PlayAnimation(FatherAnimationStates.ThrowItem);
+        }
+        else if (controller.states.flash)
         {
             PlayAnimation(FatherAnimationStates.FlashStart, true);
             return;
         }
-        else if (controller.states.attack && controller.states.comboStep == 0)
+        else if (controller.states.meleeAttacking && controller.states.comboStep == 0)
         {
             PlayAnimation(FatherAnimationStates.LeftCross, false);
             return;
         }
-        else if (controller.states.attack && controller.states.comboStep == 1)
+        else if (controller.states.meleeAttacking && controller.states.comboStep == 1)
         {
             PlayAnimation(FatherAnimationStates.RightCross, false);
             return;
         }
-        else if (controller.states.move)
+        else if (controller.states.meleeAttacking && controller.states.comboStep == 2)
         {
-
-            PlayAnimation(FatherAnimationStates.Walk);
+            PlayAnimation(FatherAnimationStates.LeftHook, false);
+            return;
         }
-        else if (!controller.states.move)
+        else if (controller.states.meleeAttacking && controller.states.comboStep == 3)
         {
-            PlayAnimation(FatherAnimationStates.Idle, true);
+            PlayAnimation(FatherAnimationStates.RightHook, false);
+            return;
+        }
+        else if (controller.states.moving)
+        {
+            if (controller.states.grabbingItem)
+            {
+                PlayAnimation(FatherAnimationStates.GrabItemWalk);
+            }
+            else
+            {
+                PlayAnimation(FatherAnimationStates.Walk);
+            }
+        }
+        else if (!controller.states.moving)
+        {
+            if (controller.states.grabbingItem)
+            {
+                PlayAnimation(FatherAnimationStates.GrabItenIdle, true);
+            }
+            else
+            {
+                PlayAnimation(FatherAnimationStates.Idle, true);
+            }
         }
         else
         {
-            PlayAnimation(FatherAnimationStates.Idle);
+            if (controller.states.grabbingItem)
+            {
+                PlayAnimation(FatherAnimationStates.GrabItenIdle);
+            }
+            else
+            {
+                PlayAnimation(FatherAnimationStates.Idle);
+            }
         }
     }
 

@@ -48,7 +48,8 @@ public static class VisionUtil
         {
             RaycastHit2D hit = hits[i];
             BoxCollider2D collider = hit.transform.GetComponent<BoxCollider2D>();
-            if (ignoreTags != null && ignoreTags.Contains(hit.transform.tag))
+            Debug.Log("ignore: " + ignoreTags + ", current: " + hit.transform.gameObject.tag + ", " + hit.transform.gameObject.name);
+            if (ignoreTags != null && ignoreTags.Contains(hit.transform.gameObject.tag))
             {
                 continue;
             }

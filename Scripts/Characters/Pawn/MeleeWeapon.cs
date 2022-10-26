@@ -25,6 +25,7 @@ public class MeleeWeapon : MonoBehaviour
 
     private Collider2D[] weaponHits = new Collider2D[10];
     private bool enableDamage_ = false;
+    private PlayerController player;
 
     public void Init(int attackDamage, Color fontColor)
     {
@@ -34,6 +35,7 @@ public class MeleeWeapon : MonoBehaviour
 
     private void Awake()
     {
+        player = GetComponentInParent<PlayerController>();
         weaponCollider = gameObject.GetComponent<BoxCollider2D>();
         weaponContactFilter.useTriggers = true;
         Physics2D.IgnoreCollision(weaponCollider, gameObject.transform.parent.GetComponent<BoxCollider2D>());
@@ -60,6 +62,7 @@ public class MeleeWeapon : MonoBehaviour
     {
         if (enableDamage)
         {
+            weaponHits = new Collider2D[10];
             weaponCollider.OverlapCollider(weaponContactFilter, weaponHits);
             for (int i = 0; i < weaponHits.Length; i++)
             {
@@ -70,20 +73,21 @@ public class MeleeWeapon : MonoBehaviour
                 bool visible = visualConditional ? VisionUtil.CanSeeEachOther(transform.parent.gameObject, weaponHits[i].gameObject, ignoringTags) : true;
                 if (visible && weaponHits[i].tag == targetTag && !singleRoundHit.Contains(weaponHits[i].gameObject))
                 {
-                    if (sendDamage)
-                    {
-                        weaponHits[i].gameObject.SendMessage("ReceiveDamage", new MessageReceiveDamage(attackDamage));
-                    }
                     if (sendDamagedEffect)
                     {
                         // gameObject.transform.parent.SendMessage("AttackEffect", new MessageAttackEffect(origin: transform.parent.position, target: weaponHits[i].transform.position, contactPosition: Vector3.zero));
-                        weaponHits[i].gameObject.SendMessage("DamagedEffect", new MessageAttackEffect(origin: transform.parent.position, target: weaponHits[i].transform.position, contactPosition: Vector3.zero));
+                        Vector3 damageDirection = player.states.lookAtDirection;
+                        weaponHits[i].gameObject.SendMessage("DamagedEffect", new MessageAttackEffect(origin: transform.parent.position, target: weaponHits[i].transform.position, contactPosition: Vector3.zero, damageDirection: damageDirection));
+                    }
+                    if (sendDamage)
+                    {
+                        weaponHits[i].gameObject.SendMessage("ReceiveDamage", new MessageReceiveDamage(attackDamage));
                     }
                     singleRoundHit.Add(weaponHits[i].gameObject);
                     if (showAttackEffect)
                     {
                         // showAttackEffect传递给攻击发起方
-                        transform.parent.gameObject.SendMessage("AttackEffect", new MessageAttackEffect(origin: transform.parent.position, target: weaponHits[i].transform.position, contactPosition: Vector3.zero));
+                        transform.parent.gameObject.SendMessage("AttackEffect", new MessageAttackEffect(origin: transform.parent.position, target: weaponHits[i].transform.position, contactPosition: Vector3.zero, damageDirection: Vector3.zero));
                     }
                 }
 
